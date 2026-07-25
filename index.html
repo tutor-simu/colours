@@ -374,48 +374,27 @@
       let currentIndex = 0;
       let quizTargetObject = null;
       let isTransitioning = false;
-      let speechTimer = null;
 
       function startGame() {
         document.getElementById("welcome-screen").style.display = "none";
         loadLearnCard(0);
       }
 
-      function speakText(text, callback) {
-        if (speechTimer) {
-          clearTimeout(speechTimer);
-          speechTimer = null;
-        }
-
-        let hasCalledCallback = false;
-        const safeCallback = () => {
-          if (!hasCalledCallback) {
-            hasCalledCallback = true;
-            if (speechTimer) clearTimeout(speechTimer);
-            if (callback) callback();
-          }
-        };
-
+      function speakText(text) {
         if ("speechSynthesis" in window) {
-          window.speechSynthesis.cancel();
+          try {
+            window.speechSynthesis.cancel(); // clear previous audio
 
-          const formattedText =
-            text.trim().endsWith(".") || text.trim().endsWith("?") || text.trim().endsWith("!") ? text : text + ".";
+            const formattedText =
+              text.trim().endsWith(".") || text.trim().endsWith("?") || text.trim().endsWith("!") ? text : text + ".";
 
-          const utterance = new SpeechSynthesisUtterance(formattedText);
-          utterance.lang = "ru-RU";
-          utterance.rate = 0.8;
-          utterance.pitch = 1.1;
+            const utterance = new SpeechSynthesisUtterance(formattedText);
+            utterance.lang = "ru-RU";
+            utterance.rate = 0.8;
+            utterance.pitch = 1.1;
 
-          utterance.onend = safeCallback;
-          utterance.onerror = safeCallback;
-
-          window.speechSynthesis.speak(utterance);
-
-          // Fallback timer in case speech synthesis fails or gets stuck on mobile
-          speechTimer = setTimeout(safeCallback, 1500);
-        } else {
-          safeCallback();
+            window.speechSynthesis.speak(utterance);
+          } catch (e) {}
         }
       }
 
@@ -489,7 +468,6 @@
           grid.appendChild(itemDiv);
         });
 
-        // Pronounces the color ONCE
         speakText(data.ru);
       }
 
@@ -538,10 +516,12 @@
           isTransitioning = true;
           triggerConfetti();
           playCorrectSound();
+          speakText("Ты угадал!");
 
-          speakText("Ты угадал!", () => {
+          // Fixed: Use a reliable setTimeout delay instead of relying on speech callbacks
+          setTimeout(() => {
             advanceQuiz();
-          });
+          }, 1200);
         } else {
           playWrongSound();
           elem.classList.add("shake");
@@ -554,10 +534,7 @@
         if (currentIndex < colorsData.length) {
           loadQuizCard(currentIndex);
         } else {
-          // Immediately trigger redirect after quiz completion
-          setTimeout(() => {
-            window.location.href = "part2.html";
-          }, 600);
+          window.location.href = "part2.html";
         }
       }
 
