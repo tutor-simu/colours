@@ -387,6 +387,15 @@
           speechTimer = null;
         }
 
+        let hasCalledCallback = false;
+        const safeCallback = () => {
+          if (!hasCalledCallback) {
+            hasCalledCallback = true;
+            if (speechTimer) clearTimeout(speechTimer);
+            if (callback) callback();
+          }
+        };
+
         if ("speechSynthesis" in window) {
           window.speechSynthesis.cancel();
 
@@ -397,10 +406,16 @@
           utterance.lang = "ru-RU";
           utterance.rate = 0.8;
           utterance.pitch = 1.1;
-          if (callback) utterance.onend = callback;
+
+          utterance.onend = safeCallback;
+          utterance.onerror = safeCallback;
+
           window.speechSynthesis.speak(utterance);
-        } else if (callback) {
-          callback();
+
+          // Fallback timer in case speech synthesis fails or gets stuck on mobile
+          speechTimer = setTimeout(safeCallback, 1500);
+        } else {
+          safeCallback();
         }
       }
 
@@ -525,9 +540,7 @@
           playCorrectSound();
 
           speakText("Ты угадал!", () => {
-            setTimeout(() => {
-              advanceQuiz();
-            }, 300);
+            advanceQuiz();
           });
         } else {
           playWrongSound();
@@ -541,12 +554,10 @@
         if (currentIndex < colorsData.length) {
           loadQuizCard(currentIndex);
         } else {
-          // After completing the last yellow/sunny question, redirect to part2.html
-          speakText("Ты угадал!", () => {
-            setTimeout(() => {
-              window.location.href = "part2.html";
-            }, 600);
-          });
+          // Immediately trigger redirect after quiz completion
+          setTimeout(() => {
+            window.location.href = "part2.html";
+          }, 600);
         }
       }
 
