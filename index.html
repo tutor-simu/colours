@@ -28,12 +28,12 @@
         align-items: center;
       }
 
-      /* Full Screen Main Container */
+      /* Full Screen Main Container with Thick Border */
       .color-container {
         width: 100vw;
         height: 100vh;
         background-color: #ffffff;
-        border: 16px solid #d93d3d; /* Dynamically changes per color */
+        border: 28px solid #d93d3d; /* Prominent thick frame */
         position: relative;
         overflow: hidden;
         display: flex;
@@ -49,19 +49,19 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-template-rows: 1fr 1fr;
-        gap: 12px;
-        padding: 12px;
+        gap: 16px;
+        padding: 16px;
       }
 
       .item {
-        border: 4px solid #d93d3d;
-        border-radius: 20px;
+        border: 6px solid #d93d3d;
+        border-radius: 28px;
         display: flex;
         justify-content: center;
         align-items: center;
         cursor: pointer;
         background-color: #ffffff;
-        box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.04);
+        box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.03);
         transition:
           transform 0.1s ease-in-out,
           border-color 0.4s ease,
@@ -74,7 +74,7 @@
 
       /* Base emoji scaling */
       .item span.emoji {
-        font-size: min(32vw, 32vh);
+        font-size: min(30vw, 30vh);
         line-height: 1;
         display: flex;
         align-items: center;
@@ -87,14 +87,14 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background-color: rgba(255, 255, 255, 0.95);
+        background-color: #ffffff;
         color: #d93d3d;
-        font-size: clamp(3rem, 10vw, 6rem);
+        font-size: clamp(2.8rem, 9vw, 5.5rem);
         font-weight: 900;
         text-transform: uppercase;
-        padding: 10px 28px;
-        border-radius: 18px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        padding: 12px 36px;
+        border-radius: 24px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         pointer-events: none;
         z-index: 10;
         text-align: center;
@@ -105,16 +105,16 @@
       /* Top Prompt Bar for Quiz Mode */
       .quiz-banner {
         position: absolute;
-        top: 16px;
+        top: 20px;
         left: 50%;
         transform: translateX(-50%);
         background-color: #ffffff;
         color: #1e293b;
-        font-size: clamp(1.5rem, 5vw, 2.5rem);
+        font-size: clamp(1.4rem, 4.5vw, 2.2rem);
         font-weight: 900;
-        padding: 10px 28px;
-        border-radius: 30px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        padding: 12px 32px;
+        border-radius: 36px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
         z-index: 12;
         display: none;
         white-space: nowrap;
@@ -123,8 +123,8 @@
       /* High-Visibility Next Arrow Button */
       .next-arrow-btn {
         position: absolute;
-        bottom: 20px;
-        right: 20px;
+        bottom: 24px;
+        right: 24px;
         background: #d93d3d;
         color: #ffffff;
         border: 4px solid #ffffff;
@@ -134,8 +134,8 @@
         font-size: 2.8rem;
         cursor: pointer;
         box-shadow:
-          0 6px 0 rgba(0, 0, 0, 0.25),
-          0 8px 16px rgba(0, 0, 0, 0.3);
+          0 6px 0 rgba(0, 0, 0, 0.2),
+          0 8px 16px rgba(0, 0, 0, 0.25);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -148,51 +148,51 @@
       .next-arrow-btn:active {
         transform: translateY(4px);
         box-shadow:
-          0 2px 0 rgba(0, 0, 0, 0.25),
-          0 4px 8px rgba(0, 0, 0, 0.3);
+          0 2px 0 rgba(0, 0, 0, 0.2),
+          0 4px 8px rgba(0, 0, 0, 0.25);
       }
 
       /* MOBILE OPTIMIZATIONS */
       @media (max-width: 768px) {
         .color-container {
-          border-width: 12px;
+          border-width: 18px; /* Thick and clear frame on phone */
         }
 
         .items-grid {
-          padding-top: 76px; /* Clear spacing for larger top banner */
-          padding-bottom: 80px; /* Clear space for larger bottom button */
-          padding-left: 8px;
-          padding-right: 8px;
+          padding-top: 72px;
+          padding-bottom: 76px;
+          padding-left: 10px;
+          padding-right: 10px;
           gap: 10px;
         }
 
         .item {
-          border-width: 3px;
-          border-radius: 16px;
+          border-width: 4px;
+          border-radius: 20px;
         }
 
-        /* Significantly larger emojis on mobile screens */
         .item span.emoji {
-          font-size: min(26vw, 26vh);
+          font-size: min(28vw, 28vh);
         }
 
         .central-text {
-          font-size: clamp(2.4rem, 9vw, 4rem);
-          padding: 8px 20px;
+          font-size: clamp(2.2rem, 8.5vw, 3.8rem);
+          padding: 8px 24px;
+          border-radius: 18px;
         }
 
         .quiz-banner {
-          top: 14px;
-          font-size: clamp(1.2rem, 5.5vw, 1.8rem);
-          padding: 8px 20px;
+          top: 12px;
+          font-size: clamp(1.2rem, 5vw, 1.7rem);
+          padding: 8px 22px;
         }
 
         .next-arrow-btn {
-          width: 66px;
-          height: 66px;
-          font-size: 2.3rem;
-          bottom: 14px;
-          right: 14px;
+          width: 64px;
+          height: 64px;
+          font-size: 2.2rem;
+          bottom: 16px;
+          right: 16px;
         }
       }
 
@@ -313,7 +313,7 @@
         if ("speechSynthesis" in window) {
           window.speechSynthesis.cancel();
 
-          // Append punctuation so TTS engines synthesize full clear words instead of cutting off single words like "Красный"
+          // Append punctuation for full/clear word output on mobile browsers
           const formattedText =
             text.trim().endsWith(".") || text.trim().endsWith("?") || text.trim().endsWith("!") ? text : text + ".";
 
@@ -326,14 +326,6 @@
         } else if (callback) {
           callback();
         }
-      }
-
-      function speakColorTwice(text) {
-        speakText(text, () => {
-          speechTimer = setTimeout(() => {
-            speakText(text);
-          }, 400);
-        });
       }
 
       function playWrongSound() {
@@ -405,7 +397,8 @@
           grid.appendChild(itemDiv);
         });
 
-        speakColorTwice(data.ru);
+        // Pronounces the color ONCE
+        speakText(data.ru);
       }
 
       function loadQuizCard(index) {
