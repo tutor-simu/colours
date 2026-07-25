@@ -19,7 +19,7 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background-color: #d93d3d; /* Dynamically changes outer color */
+        background-color: #d93d3d; /* Dynamic active color */
         transition: background-color 0.4s ease;
       }
 
@@ -80,17 +80,17 @@
         transform: scale(0.95);
       }
 
-      /* Inner White Container wrapped in Outer Color */
+      /* Main Full Screen Container */
       .color-container {
         width: 100vw;
         height: 100vh;
-        background-color: #d93d3d; /* Outer Frame Base */
+        background-color: #d93d3d;
         position: relative;
         overflow: hidden;
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 24px; /* Creates the outer colored border on ALL screen sizes */
+        padding: 30px; /* 30px border from edges */
         transition: background-color 0.4s ease;
       }
 
@@ -98,7 +98,7 @@
         width: 100%;
         height: 100%;
         background-color: #ffffff;
-        border-radius: 32px;
+        border-radius: 28px;
         position: relative;
         overflow: hidden;
         display: flex;
@@ -183,7 +183,7 @@
         white-space: nowrap;
       }
 
-      /* High-Visibility Next Arrow Button */
+      /* Circular Next Arrow Button */
       .next-arrow-btn {
         position: absolute;
         bottom: 24px;
@@ -212,48 +212,48 @@
         transform: translateY(4px);
       }
 
-      /* MOBILE OPTIMIZATIONS */
+      /* STRICT MOBILE PHONE ADJUSTMENTS */
       @media (max-width: 768px) {
         .color-container {
-          padding: 16px; /* Outer frame margin on small screens */
+          padding: 30px !important; /* Strict 30px outer frame padding from edges */
         }
 
         .inner-white-board {
-          border-radius: 24px;
+          border-radius: 20px;
         }
 
         .items-grid {
-          padding: 12px;
+          padding: 10px;
           gap: 10px;
         }
 
         .item {
           border-width: 4px;
-          border-radius: 20px;
-        }
-
-        .item span.emoji {
-          font-size: min(26vw, 20vh);
-        }
-
-        .central-text {
-          font-size: clamp(2rem, 8vw, 3.5rem);
-          padding: 8px 24px;
           border-radius: 18px;
         }
 
-        .quiz-banner {
-          top: 12px;
-          font-size: clamp(1.1rem, 4.8vw, 1.6rem);
+        .item span.emoji {
+          font-size: min(24vw, 18vh);
+        }
+
+        .central-text {
+          font-size: clamp(1.8rem, 7.5vw, 3.2rem);
           padding: 8px 20px;
+          border-radius: 16px;
+        }
+
+        .quiz-banner {
+          top: 10px;
+          font-size: clamp(1rem, 4.2vw, 1.4rem);
+          padding: 6px 16px;
         }
 
         .next-arrow-btn {
-          width: 64px;
-          height: 64px;
-          font-size: 2.2rem;
-          bottom: 16px;
-          right: 16px;
+          width: 60px;
+          height: 60px;
+          font-size: 2rem;
+          bottom: 12px;
+          right: 12px;
         }
       }
 
@@ -541,7 +541,12 @@
         if (currentIndex < colorsData.length) {
           loadQuizCard(currentIndex);
         } else {
-          speakText("Ты угадал!");
+          // After completing the last yellow/sunny question, redirect to part2.html
+          speakText("Ты угадал!", () => {
+            setTimeout(() => {
+              window.location.href = "part2.html";
+            }, 600);
+          });
         }
       }
 
