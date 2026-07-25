@@ -446,7 +446,7 @@
           triggerConfetti();
           playCorrectSound();
 
-          speakText("Правильно! Молодец!", () => {
+          speakText("Ты угадал!", () => {
             setTimeout(() => {
               advanceQuiz();
             }, 300);
@@ -463,11 +463,7 @@
         if (currentIndex < colorsData.length) {
           loadQuizCard(currentIndex);
         } else {
-          speakText("Отлично! Ты прошёл всё задание!", () => {
-            setTimeout(() => {
-              window.location.href = "part2.html";
-            }, 500);
-          });
+          speakText("Ты угадал!");
         }
       }
 
