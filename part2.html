@@ -511,6 +511,24 @@
       }
 
       window.addEventListener("DOMContentLoaded", startGame);
+      // Trigger recognition on user touch/click
+      document.addEventListener(
+        "click",
+        () => {
+          if (audioCtx && audioCtx.state === "suspended") {
+            audioCtx.resume();
+          }
+
+          if (recognition) {
+            try {
+              recognition.start();
+            } catch (e) {
+              // Already running
+            }
+          }
+        },
+        { once: true },
+      );
     </script>
   </body>
 </html>
