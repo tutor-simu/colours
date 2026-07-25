@@ -72,23 +72,13 @@
         transform: scale(0.97);
       }
 
-      /* Large responsive emoji scaling (Desktop) */
+      /* Desktop emoji scaling */
       .item span.emoji {
         font-size: min(30vw, 30vh);
         line-height: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-      }
-
-      /* Mobile Adjustment: Prevents stretching and maximizes size within tile */
-      @media (max-width: 768px) {
-        .item span.emoji {
-          font-size: 22vmin;
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
       }
 
       /* Center Text Label */
@@ -130,12 +120,12 @@
         white-space: nowrap;
       }
 
-      /* High-Visibility Next Arrow Button (Dynamically Colored) */
+      /* High-Visibility Next Arrow Button */
       .next-arrow-btn {
         position: absolute;
         bottom: 20px;
         right: 20px;
-        background: #d93d3d; /* Dynamically updated in JavaScript */
+        background: #d93d3d;
         color: #ffffff;
         border: 4px solid #ffffff;
         border-radius: 50%;
@@ -160,6 +150,44 @@
         box-shadow:
           0 2px 0 rgba(0, 0, 0, 0.25),
           0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      /* MOBILE OPTIMIZATIONS (Does not affect desktop) */
+      @media (max-width: 768px) {
+        .color-container {
+          border-width: 10px;
+        }
+
+        .items-grid {
+          padding-top: 64px; /* Leaves clear space for top header */
+          padding-bottom: 74px; /* Leaves clear space for bottom button */
+          padding-left: 8px;
+          padding-right: 8px;
+          gap: 10px;
+        }
+
+        .item {
+          border-width: 3px;
+          border-radius: 16px;
+        }
+
+        .item span.emoji {
+          font-size: min(18vw, 18vh); /* Smaller, proportional emoji size */
+        }
+
+        .quiz-banner {
+          top: 12px;
+          font-size: clamp(1rem, 4vw, 1.4rem);
+          padding: 8px 18px;
+        }
+
+        .next-arrow-btn {
+          width: 58px;
+          height: 58px;
+          font-size: 2rem;
+          bottom: 12px;
+          right: 12px;
+        }
       }
 
       /* Shake animation for wrong selection */
@@ -217,7 +245,6 @@
       <button class="next-arrow-btn" id="next-btn" onclick="handleNextClick()">➔</button>
     </div>
     <script>
-      // Color Dataset
       const colorsData = [
         {
           ru: "Красный",
