@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Учим Цвета - Часть 2</title>
+    <title>Учим Цвета - Голос</title>
     <style>
       * {
         box-sizing: border-box;
@@ -30,7 +30,6 @@
         align-items: center;
       }
 
-      /* Dynamic Frame Border */
       .game-container {
         width: 100vw;
         height: 100dvh;
@@ -46,7 +45,6 @@
         transition: border-color 0.4s ease;
       }
 
-      /* Dynamic Instruction Banner on Top */
       .prompt-banner {
         background-color: #ffffff;
         color: #1e293b;
@@ -60,7 +58,6 @@
         margin-top: 10px;
       }
 
-      /* Single Centered Image Card */
       .hero-image-card {
         width: min(70vw, 45dvh);
         height: min(70vw, 45dvh);
@@ -86,7 +83,20 @@
         line-height: 1;
       }
 
-      /* Shake animation for wrong selection or speech */
+      .bounce {
+        animation: bounceAnim 0.4s ease;
+      }
+
+      @keyframes bounceAnim {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.08);
+        }
+      }
+
       .shake {
         animation: shakeAnim 0.4s ease;
       }
@@ -110,19 +120,20 @@
         }
       }
 
-      /* Mic Status Indicator */
       .mic-status {
         display: flex;
         align-items: center;
         gap: 12px;
         background-color: #f1f5f9;
-        padding: 10px 22px;
+        padding: 12px 24px;
         border-radius: 20px;
         font-size: clamp(1rem, 3.5vw, 1.3rem);
         color: #475569;
         font-weight: 600;
         z-index: 10;
         margin-bottom: 10px;
+        max-width: 90%;
+        text-align: center;
       }
 
       .mic-icon {
@@ -130,6 +141,7 @@
         height: 16px;
         border-radius: 50%;
         background-color: #ef4444;
+        flex-shrink: 0;
         animation: pulse 1.4s infinite ease-in-out;
       }
 
@@ -148,7 +160,6 @@
         }
       }
 
-      /* Success Popup Overlay */
       .success-toast {
         position: absolute;
         top: 50%;
@@ -174,36 +185,6 @@
         transform: translate(-50%, -50%) scale(1);
       }
 
-      /* Start Overlay for Mobile Autoplay & Mic Permission */
-      .start-overlay {
-        position: fixed;
-        inset: 0;
-        background-color: #ffffff;
-        z-index: 100;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-      }
-
-      .start-btn {
-        background-color: #22c55e;
-        color: white;
-        border: none;
-        padding: 18px 48px;
-        font-size: 2rem;
-        font-weight: 900;
-        border-radius: 50px;
-        box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
-        cursor: pointer;
-      }
-
-      .start-btn:active {
-        transform: scale(0.95);
-      }
-
-      /* Confetti Canvas */
       #confetti-canvas {
         position: absolute;
         top: 0;
@@ -219,21 +200,17 @@
     <div class="game-container" id="game-frame">
       <canvas id="confetti-canvas"></canvas>
 
-      <!-- Written Instruction Bar on Top -->
       <div class="prompt-banner" id="prompt-banner">Какой это цвет?</div>
 
-      <!-- Single Centered Picture (Tap or Speak) -->
       <div class="hero-image-card" id="hero-card" onclick="handleCardTap()">
         <span class="emoji" id="hero-emoji">🍎</span>
       </div>
 
-      <!-- Voice Indicator -->
       <div class="mic-status" id="mic-status">
-        <div class="mic-icon"></div>
-        <span id="mic-label">Назови цвет или нажми</span>
+        <div class="mic-icon" id="mic-icon"></div>
+        <span id="mic-label">Слушаю... Назови цвет!</span>
       </div>
 
-      <!-- Big Success Feedback Popup -->
       <div class="success-toast" id="success-toast">Правильно!<br />КРАСНЫЙ</div>
     </div>
 
@@ -242,32 +219,32 @@
         {
           promptText: "Какой это цвет?",
           colorRu: "Красный",
-          correctKeywords: ["красный", "красная", "красное", "яблоко"],
-          wrongKeywords: ["синий", "зелёный", "зеленый", "жёлтый", "желтый"],
+          correctKeywords: ["красн", "крас", "яблок", "яблоко", "красный", "красная", "красное"],
+          wrongKeywords: ["сини", "син", "зелен", "зелён", "желт", "жёлт"],
           hex: "#d93d3d",
           emoji: "🍎",
         },
         {
           promptText: "Какой это цвет?",
           colorRu: "Синий",
-          correctKeywords: ["синий", "синяя", "синее", "кит"],
-          wrongKeywords: ["красный", "зелёный", "зеленый", "жёлтый", "желтый"],
+          correctKeywords: ["сини", "син", "кит", "синий", "синяя", "синее"],
+          wrongKeywords: ["красн", "крас", "зелен", "зелён", "желт", "жёлт"],
           hex: "#2563eb",
           emoji: "🐋",
         },
         {
           promptText: "А это?",
           colorRu: "Зелёный",
-          correctKeywords: ["зелёный", "зеленый", "зелёная", "лягушка"],
-          wrongKeywords: ["красный", "синий", "жёлтый", "желтый"],
+          correctKeywords: ["зелен", "зелён", "зельон", "лягушк", "лист", "зелёный", "зеленый"],
+          wrongKeywords: ["красн", "крас", "сини", "син", "желт", "жёлт"],
           hex: "#22c55e",
           emoji: "🍃",
         },
         {
           promptText: "А это?",
           colorRu: "Жёлтый",
-          correctKeywords: ["жёлтый", "желтый", "жёлтая", "банан"],
-          wrongKeywords: ["красный", "синий", "зелёный", "зеленый"],
+          correctKeywords: ["желт", "жёлт", "банан", "жёлтый", "желтый"],
+          wrongKeywords: ["красн", "крас", "сини", "син", "зелен", "зелён"],
           hex: "#eab308",
           emoji: "🍌",
         },
@@ -276,7 +253,6 @@
       let currentIndex = 0;
       let isTransitioning = false;
       let recognition = null;
-      let speechTimer = null;
       let audioCtx = null;
 
       function getAudioContext() {
@@ -290,11 +266,6 @@
       }
 
       function speakText(text, callback) {
-        if (speechTimer) {
-          clearTimeout(speechTimer);
-          speechTimer = null;
-        }
-
         if ("speechSynthesis" in window) {
           window.speechSynthesis.cancel();
           const utterance = new SpeechSynthesisUtterance(text);
@@ -352,7 +323,7 @@
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
         if (!SpeechRecognition) {
-          document.getElementById("mic-label").textContent = "Нажми на картинку!";
+          document.getElementById("mic-label").textContent = "Голосовой ввод не поддерживается вашим браузером";
           return;
         }
 
@@ -366,6 +337,8 @@
 
           for (let i = event.resultIndex; i < event.results.length; ++i) {
             const transcript = event.results[i][0].transcript.toLowerCase().trim();
+            document.getElementById("mic-label").textContent = `Слышу: "${transcript}"`;
+
             const currentItem = speechItems[currentIndex];
 
             const isCorrect = currentItem.correctKeywords.some((keyword) => transcript.includes(keyword));
@@ -383,7 +356,7 @@
         };
 
         recognition.onerror = () => {
-          document.getElementById("mic-label").textContent = "Нажми на картинку!";
+          document.getElementById("mic-label").textContent = "Слушаю... Скажи цвет!";
         };
 
         recognition.onend = () => {
@@ -415,6 +388,7 @@
 
         promptBanner.textContent = item.promptText;
         toast.classList.remove("show");
+        document.getElementById("mic-label").textContent = "Слушаю... Назови цвет!";
 
         speakText(item.promptText);
       }
@@ -453,15 +427,21 @@
           setTimeout(() => {
             card.classList.remove("shake");
             isTransitioning = false;
+            document.getElementById("mic-label").textContent = "Слушаю... Назови цвет!";
           }, 400);
         });
       }
 
       function handleCardTap() {
         getAudioContext();
-        if (!isTransitioning) {
-          triggerSuccess();
-        }
+        if (isTransitioning) return;
+
+        const card = document.getElementById("hero-card");
+        card.classList.add("bounce");
+        setTimeout(() => card.classList.remove("bounce"), 400);
+
+        const currentItem = speechItems[currentIndex];
+        speakText(currentItem.promptText);
       }
 
       function advanceGame() {
@@ -479,6 +459,7 @@
           toast.classList.add("show");
 
           document.getElementById("prompt-banner").textContent = "Отлично!";
+          document.getElementById("mic-label").textContent = "Игра окончена!";
           speakText("Молодец! Ты отлично знаешь все цвета!");
         }
       }
@@ -525,10 +506,11 @@
 
       function startGame() {
         getAudioContext();
-        document.getElementById("start-overlay").style.display = "none";
         loadCard(0);
         initSpeechRecognition();
       }
+
+      window.addEventListener("DOMContentLoaded", startGame);
     </script>
   </body>
 </html>
