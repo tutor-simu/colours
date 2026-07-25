@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Учим Цвета - Часть 2</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Comic Sans MS", "Chalkboard SE", "Fredoka", cursive, sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #ffffff;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* Dynamic Frame Border */
+      .game-container {
+        width: 100vw;
+        height: 100vh;
+        background-color: #ffffff;
+        border: 16px solid #d93d3d;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 16px;
+        transition: border-color 0.4s ease;
+      }
+
+      /* Dynamic Instruction Banner on Top */
+      .prompt-banner {
+        background-color: #ffffff;
+        color: #1e293b;
+        font-size: clamp(1.5rem, 5vw, 2.8rem);
+        font-weight: 900;
+        padding: 12px 32px;
+        border-radius: 30px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+        z-index: 10;
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      /* Single Centered Image Card */
+      .hero-image-card {
+        width: min(70vw, 55vh);
+        height: min(70vw, 55vh);
+        border: 8px solid #d93d3d;
+        border-radius: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #ffffff;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          border-color 0.4s ease;
+      }
+
+      .hero-image-card:active {
+        transform: scale(0.95);
+      }
+
+      .hero-image-card span.emoji {
+        font-size: min(48vw, 40vh);
+        line-height: 1;
+      }
+
+      /* Shake animation for wrong selection or speech */
+      .shake {
+        animation: shakeAnim 0.4s ease;
+      }
+
+      @keyframes shakeAnim {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-12px);
+        }
+        40% {
+          transform: translateX(12px);
+        }
+        60% {
+          transform: translateX(-8px);
+        }
+        80% {
+          transform: translateX(8px);
+        }
+      }
+
+      /* Mic Status Indicator */
+      .mic-status {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background-color: #f1f5f9;
+        padding: 10px 22px;
+        border-radius: 20px;
+        font-size: clamp(1rem, 3.5vw, 1.3rem);
+        color: #475569;
+        font-weight: 600;
+        z-index: 10;
+        margin-bottom: 10px;
+      }
+
+      .mic-icon {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background-color: #ef4444;
+        animation: pulse 1.4s infinite ease-in-out;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.85);
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        }
+        70% {
+          transform: scale(1.1);
+          box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+        }
+        100% {
+          transform: scale(0.85);
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        }
+      }
+
+      /* Success Popup Overlay */
+      .success-toast {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0.8);
+        background-color: rgba(255, 255, 255, 0.98);
+        border: 6px solid #22c55e;
+        color: #15803d;
+        padding: 24px 36px;
+        border-radius: 28px;
+        font-size: clamp(2.2rem, 7vw, 4rem);
+        font-weight: 900;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        opacity: 0;
+        pointer-events: none;
+        z-index: 40;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .success-toast.show {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      /* Confetti Canvas */
+      #confetti-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 30;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-container" id="game-frame">
+      <canvas id="confetti-canvas"></canvas>
+
+      <!-- Written Instruction Bar on Top -->
+      <div class="prompt-banner" id="prompt-banner">Какой это цвет?</div>
+
+      <!-- Single Centered Picture (Tap or Speak) -->
+      <div class="hero-image-card" id="hero-card" onclick="handleCardTap()">
+        <span class="emoji" id="hero-emoji">🍎</span>
+      </div>
+
+      <!-- Voice Indicator -->
+      <div class="mic-status" id="mic-status">
+        <div class="mic-icon"></div>
+        <span id="mic-label">Назови цвет или нажми</span>
+      </div>
+
+      <!-- Big Success Feedback Popup -->
+      <div class="success-toast" id="success-toast">Правильно!<br />КРАСНЫЙ</div>
+    </div>
+
+    <script>
+      // Exactly 4 cards with custom prompts & wrong answers dataset
+      const speechItems = [
+        {
+          promptText: "Какой это цвет?",
+          colorRu: "Красный",
+          correctKeywords: ["красный", "красная", "красное", "яблоко"],
+          wrongKeywords: ["синий", "зелёный", "зеленый", "жёлтый", "желтый"],
+          hex: "#d93d3d",
+          emoji: "🍎",
+        },
+        {
+          promptText: "Какой это цвет?",
+          colorRu: "Синий",
+          correctKeywords: ["синий", "синяя", "синее", "кит"],
+          wrongKeywords: ["красный", "зелёный", "зеленый", "жёлтый", "желтый"],
+          hex: "#2563eb",
+          emoji: "🐋",
+        },
+        {
+          promptText: "А это?",
+          colorRu: "Зелёный",
+          correctKeywords: ["зелёный", "зеленый", "зелёная", "лягушка"],
+          wrongKeywords: ["красный", "синий", "жёлтый", "желтый"],
+          hex: "#22c55e",
+          emoji: "🍃",
+        },
+        {
+          promptText: "А это?",
+          colorRu: "Жёлтый",
+          correctKeywords: ["жёлтый", "желтый", "жёлтая", "банан"],
+          wrongKeywords: ["красный", "синий", "зелёный", "зеленый"],
+          hex: "#eab308",
+          emoji: "🍌",
+        },
+      ];
+
+      let currentIndex = 0;
+      let isTransitioning = false;
+      let recognition = null;
+      let speechTimer = null;
+
+      // Safe Audio Speech Output
+      function speakText(text, callback) {
+        if (speechTimer) {
+          clearTimeout(speechTimer);
+          speechTimer = null;
+        }
+
+        if ("speechSynthesis" in window) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = "ru-RU";
+          utterance.rate = 0.85;
+          utterance.pitch = 1.1;
+          if (callback) utterance.onend = callback;
+          window.speechSynthesis.speak(utterance);
+        } else if (callback) {
+          callback();
+        }
+      }
+
+      // Play Victory Chime
+      function playCorrectSound() {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          notes.forEach((freq, index) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const startTime = ctx.currentTime + index * 0.08;
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(0.25, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + 0.25);
+          });
+        } catch (e) {}
+      }
+
+      // Play Gentle Wrong Selection Sound
+      function playWrongSound() {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const playNote = (freq, startTime, duration) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(0.2, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+          };
+          playNote(260, ctx.currentTime, 0.12);
+          playNote(220, ctx.currentTime + 0.12, 0.18);
+        } catch (e) {}
+      }
+
+      // Speech Recognition Setup
+      function initSpeechRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+          document.getElementById("mic-label").textContent = "Нажми на картинку!";
+          return;
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = "ru-RU";
+        recognition.continuous = true;
+        recognition.interimResults = true;
+
+        recognition.onresult = (event) => {
+          if (isTransitioning) return;
+
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            const transcript = event.results[i][0].transcript.toLowerCase().trim();
+            const currentItem = speechItems[currentIndex];
+
+            // Check correct answer
+            const isCorrect = currentItem.correctKeywords.some((keyword) => transcript.includes(keyword));
+            if (isCorrect) {
+              triggerSuccess();
+              break;
+            }
+
+            // Check wrong answer
+            const isWrong = currentItem.wrongKeywords.some((keyword) => transcript.includes(keyword));
+            if (isWrong) {
+              triggerWrong();
+              break;
+            }
+          }
+        };
+
+        recognition.onerror = () => {
+          document.getElementById("mic-label").textContent = "Нажми на картинку!";
+        };
+
+        recognition.onend = () => {
+          if (!isTransitioning && recognition) {
+            try {
+              recognition.start();
+            } catch (e) {}
+          }
+        };
+
+        try {
+          recognition.start();
+        } catch (e) {}
+      }
+
+      // Display Card & Pronounce Prompt
+      function loadCard(index) {
+        isTransitioning = false;
+        const item = speechItems[index];
+
+        const frame = document.getElementById("game-frame");
+        const card = document.getElementById("hero-card");
+        const emoji = document.getElementById("hero-emoji");
+        const toast = document.getElementById("success-toast");
+        const promptBanner = document.getElementById("prompt-banner");
+
+        frame.style.borderColor = item.hex;
+        card.style.borderColor = item.hex;
+        emoji.textContent = item.emoji;
+
+        // Set top prompt: 1&2 = "Какой это цвет?", 3&4 = "А это?"
+        promptBanner.textContent = item.promptText;
+
+        toast.classList.remove("show");
+
+        // Speak the matching prompt aloud
+        speakText(item.promptText);
+      }
+
+      // Trigger Correct Answer Sequence
+      function triggerSuccess() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+
+        const item = speechItems[currentIndex];
+        const toast = document.getElementById("success-toast");
+
+        toast.innerHTML = `Правильно!<br>${item.colorRu.toUpperCase()}`;
+        toast.style.borderColor = item.hex;
+        toast.style.color = item.hex;
+        toast.classList.add("show");
+
+        triggerConfetti();
+        playCorrectSound();
+
+        speakText(`Правильно! ${item.colorRu}!`, () => {
+          setTimeout(() => {
+            advanceGame();
+          }, 600);
+        });
+      }
+
+      // Trigger Wrong Answer Sequence
+      function triggerWrong() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+
+        const card = document.getElementById("hero-card");
+        playWrongSound();
+        card.classList.add("shake");
+
+        speakText("Попробуй ещё раз!", () => {
+          setTimeout(() => {
+            card.classList.remove("shake");
+            isTransitioning = false;
+          }, 400);
+        });
+      }
+
+      // Tap on Card Fallback
+      function handleCardTap() {
+        if (!isTransitioning) {
+          triggerSuccess();
+        }
+      }
+
+      // Move to Next Card or Finish
+      function advanceGame() {
+        currentIndex++;
+        if (currentIndex < speechItems.length) {
+          loadCard(currentIndex);
+        } else {
+          // Final Game Finish Screen (Does NOT redirect to index.html)
+          isTransitioning = true;
+          triggerConfetti();
+
+          const toast = document.getElementById("success-toast");
+          toast.innerHTML = "Ты молодец!<br>🎉🎉🎉";
+          toast.style.borderColor = "#22c55e";
+          toast.style.color = "#22c55e";
+          toast.classList.add("show");
+
+          document.getElementById("prompt-banner").textContent = "Отлично!";
+          speakText("Молодец! Ты отлично знаешь все цвета!");
+        }
+      }
+
+      // Confetti Effect
+      function triggerConfetti() {
+        const canvas = document.getElementById("confetti-canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+
+        const particles = [];
+        const colors = ["#ef4444", "#3b82f6", "#22c55e", "#eab308", "#ec4899"];
+
+        for (let i = 0; i < 40; i++) {
+          particles.push({
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            vx: (Math.random() - 0.5) * 12,
+            vy: (Math.random() - 0.7) * 12,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            size: Math.random() * 8 + 4,
+          });
+        }
+
+        let frames = 0;
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          particles.forEach((p) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.3;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          frames++;
+          if (frames < 40) requestAnimationFrame(animate);
+          else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        animate();
+      }
+
+      window.addEventListener("load", () => {
+        loadCard(0);
+        initSpeechRecognition();
+      });
+    </script>
+  </body>
+</html>
