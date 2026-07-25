@@ -72,13 +72,23 @@
         transform: scale(0.97);
       }
 
-      /* Large responsive emoji scaling */
+      /* Large responsive emoji scaling (Desktop) */
       .item span.emoji {
         font-size: min(30vw, 30vh);
         line-height: 1;
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+
+      /* Mobile Adjustment: Prevents stretching and maximizes size within tile */
+      @media (max-width: 768px) {
+        .item span.emoji {
+          font-size: 22vmin;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
       }
 
       /* Center Text Label */
@@ -417,13 +427,11 @@
         }
       }
 
-      // SECTION UPDATED HERE
       function advanceQuiz() {
         currentIndex++;
         if (currentIndex < colorsData.length) {
           loadQuizCard(currentIndex);
         } else {
-          // Finished full round (Learn + Quiz)! Redirect to part2.html
           speakText("Отлично! Ты прошёл всё задание!", () => {
             setTimeout(() => {
               window.location.href = "part2.html";
