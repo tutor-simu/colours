@@ -68,14 +68,7 @@
         align-items: center;
         background-color: #ffffff;
         box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition:
-          transform 0.15s ease,
-          border-color 0.4s ease;
-      }
-
-      .hero-image-card:active {
-        transform: scale(0.95);
+        transition: border-color 0.4s ease;
       }
 
       .hero-image-card span.emoji {
@@ -120,43 +113,61 @@
         }
       }
 
-      .mic-status {
+      /* Standalone Microphone Button Bar */
+      .mic-btn {
         display: flex;
         align-items: center;
-        gap: 12px;
+        justify-content: center;
+        gap: 14px;
         background-color: #f1f5f9;
-        padding: 12px 24px;
-        border-radius: 20px;
-        font-size: clamp(1rem, 3.5vw, 1.3rem);
-        color: #475569;
-        font-weight: 600;
-        z-index: 10;
-        margin-bottom: 10px;
+        border: 4px solid #cbd5e1;
+        padding: 14px 28px;
+        border-radius: 30px;
+        font-size: clamp(1.1rem, 4vw, 1.4rem);
+        color: #1e293b;
+        font-weight: 700;
+        z-index: 20;
+        margin-bottom: 12px;
         max-width: 90%;
         text-align: center;
+        cursor: pointer;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        transition:
+          transform 0.1s ease,
+          background-color 0.2s ease,
+          border-color 0.2s ease;
       }
 
-      .mic-icon {
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background-color: #ef4444;
+      .mic-btn:active {
+        transform: scale(0.96);
+      }
+
+      .mic-btn.listening {
+        background-color: #fef2f2;
+        border-color: #ef4444;
+        color: #991b1b;
+      }
+
+      .mic-icon-svg {
+        width: 28px;
+        height: 28px;
+        fill: currentColor;
         flex-shrink: 0;
-        animation: pulse 1.4s infinite ease-in-out;
+      }
+
+      .mic-btn.listening .mic-icon-svg {
+        animation: pulse 1.2s infinite ease-in-out;
       }
 
       @keyframes pulse {
         0% {
-          transform: scale(0.85);
-          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+          transform: scale(0.9);
         }
-        70% {
-          transform: scale(1.1);
-          box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+        50% {
+          transform: scale(1.25);
         }
         100% {
-          transform: scale(0.85);
-          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+          transform: scale(0.9);
         }
       }
 
@@ -202,14 +213,19 @@
 
       <div class="prompt-banner" id="prompt-banner">Какой это цвет?</div>
 
-      <div class="hero-image-card" id="hero-card" onclick="handleCardTap()">
+      <div class="hero-image-card" id="hero-card">
         <span class="emoji" id="hero-emoji">🍎</span>
       </div>
 
-      <div class="mic-status" id="mic-status">
-        <div class="mic-icon" id="mic-icon"></div>
-        <span id="mic-label">Слушаю... Назови цвет!</span>
-      </div>
+      <!-- Interactive Microphone Button -->
+      <button class="mic-btn" id="mic-btn" onclick="toggleOrStartListening()">
+        <svg class="mic-icon-svg" viewBox="0 0 24 24">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+          <path
+            d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+        </svg>
+        <span id="mic-label">Нажми, чтобы сказать!</span>
+      </button>
 
       <div class="success-toast" id="success-toast">Правильно!<br />КРАСНЫЙ</div>
     </div>
@@ -254,6 +270,7 @@
       let isTransitioning = false;
       let recognition = null;
       let audioCtx = null;
+      let isListening = false;
 
       function getAudioContext() {
         if (!audioCtx) {
@@ -323,21 +340,28 @@
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
         if (!SpeechRecognition) {
-          document.getElementById("mic-label").textContent = "Голосовой ввод не поддерживается вашим браузером";
+          document.getElementById("mic-label").textContent = "Голос не поддерживается";
           return;
         }
 
         recognition = new SpeechRecognition();
         recognition.lang = "ru-RU";
-        recognition.continuous = true;
+        recognition.continuous = false; // Set to false to avoid persistent background mobile bugs
         recognition.interimResults = true;
+
+        recognition.onstart = () => {
+          isListening = true;
+          const btn = document.getElementById("mic-btn");
+          btn.classList.add("listening");
+          document.getElementById("mic-label").textContent = "Слушаю... Говори!";
+        };
 
         recognition.onresult = (event) => {
           if (isTransitioning) return;
 
           for (let i = event.resultIndex; i < event.results.length; ++i) {
             const transcript = event.results[i][0].transcript.toLowerCase().trim();
-            document.getElementById("mic-label").textContent = `Слышу: "${transcript}"`;
+            document.getElementById("mic-label").textContent = `"${transcript}"`;
 
             const currentItem = speechItems[currentIndex];
 
@@ -356,20 +380,39 @@
         };
 
         recognition.onerror = () => {
-          document.getElementById("mic-label").textContent = "Слушаю... Скажи цвет!";
+          stopListeningState();
         };
 
         recognition.onend = () => {
-          if (!isTransitioning && recognition) {
-            try {
-              recognition.start();
-            } catch (e) {}
-          }
+          stopListeningState();
         };
+      }
 
-        try {
-          recognition.start();
-        } catch (e) {}
+      function stopListeningState() {
+        isListening = false;
+        const btn = document.getElementById("mic-btn");
+        btn.classList.remove("listening");
+        if (!isTransitioning) {
+          document.getElementById("mic-label").textContent = "Нажми, чтобы сказать!";
+        }
+      }
+
+      function toggleOrStartListening() {
+        getAudioContext();
+
+        if (!recognition) {
+          initSpeechRecognition();
+        }
+
+        if (isListening) {
+          try {
+            recognition.stop();
+          } catch (e) {}
+        } else {
+          try {
+            recognition.start();
+          } catch (e) {}
+        }
       }
 
       function loadCard(index) {
@@ -388,14 +431,26 @@
 
         promptBanner.textContent = item.promptText;
         toast.classList.remove("show");
-        document.getElementById("mic-label").textContent = "Слушаю... Назови цвет!";
 
-        speakText(item.promptText);
+        stopListeningState();
+
+        speakText(item.promptText, () => {
+          // Attempt to start listening after speech ends
+          try {
+            if (recognition && !isListening) recognition.start();
+          } catch (e) {}
+        });
       }
 
       function triggerSuccess() {
         if (isTransitioning) return;
         isTransitioning = true;
+
+        if (recognition) {
+          try {
+            recognition.stop();
+          } catch (e) {}
+        }
 
         const item = speechItems[currentIndex];
         const toast = document.getElementById("success-toast");
@@ -419,6 +474,12 @@
         if (isTransitioning) return;
         isTransitioning = true;
 
+        if (recognition) {
+          try {
+            recognition.stop();
+          } catch (e) {}
+        }
+
         const card = document.getElementById("hero-card");
         playWrongSound();
         card.classList.add("shake");
@@ -427,21 +488,9 @@
           setTimeout(() => {
             card.classList.remove("shake");
             isTransitioning = false;
-            document.getElementById("mic-label").textContent = "Слушаю... Назови цвет!";
+            document.getElementById("mic-label").textContent = "Нажми, чтобы сказать!";
           }, 400);
         });
-      }
-
-      function handleCardTap() {
-        getAudioContext();
-        if (isTransitioning) return;
-
-        const card = document.getElementById("hero-card");
-        card.classList.add("bounce");
-        setTimeout(() => card.classList.remove("bounce"), 400);
-
-        const currentItem = speechItems[currentIndex];
-        speakText(currentItem.promptText);
       }
 
       function advanceGame() {
@@ -504,31 +553,10 @@
         animate();
       }
 
-      function startGame() {
-        getAudioContext();
-        loadCard(0);
+      window.addEventListener("DOMContentLoaded", () => {
         initSpeechRecognition();
-      }
-
-      window.addEventListener("DOMContentLoaded", startGame);
-      // Trigger recognition on user touch/click
-      document.addEventListener(
-        "click",
-        () => {
-          if (audioCtx && audioCtx.state === "suspended") {
-            audioCtx.resume();
-          }
-
-          if (recognition) {
-            try {
-              recognition.start();
-            } catch (e) {
-              // Already running
-            }
-          }
-        },
-        { once: true },
-      );
+        loadCard(0);
+      });
     </script>
   </body>
 </html>
