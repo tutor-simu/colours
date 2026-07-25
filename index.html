@@ -19,7 +19,8 @@
         width: 100%;
         height: 100%;
         overflow: hidden;
-        background-color: #ffffff;
+        background-color: #d93d3d; /* Dynamically changes outer color */
+        transition: background-color 0.4s ease;
       }
 
       body {
@@ -28,21 +29,84 @@
         align-items: center;
       }
 
-      /* Full Screen Main Container with Thick Border */
+      /* Entrance / Welcome Overlay Screen */
+      .welcome-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 24px;
+      }
+
+      .welcome-title {
+        color: #d93d3d;
+        font-size: clamp(2.5rem, 8vw, 4.5rem);
+        font-weight: 900;
+        text-shadow: 2px 2px 0px #ffffff;
+        margin-bottom: 12px;
+      }
+
+      .welcome-subtitle {
+        color: #475569;
+        font-size: clamp(1.2rem, 4vw, 2rem);
+        font-weight: 700;
+        margin-bottom: 32px;
+      }
+
+      .start-btn {
+        background-color: #22c55e;
+        color: #ffffff;
+        border: 4px solid #ffffff;
+        font-size: clamp(1.8rem, 6vw, 2.8rem);
+        font-weight: 900;
+        padding: 16px 48px;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(34, 197, 94, 0.4);
+        transition:
+          transform 0.1s ease,
+          background-color 0.2s ease;
+      }
+
+      .start-btn:active {
+        transform: scale(0.95);
+      }
+
+      /* Inner White Container wrapped in Outer Color */
       .color-container {
         width: 100vw;
         height: 100vh;
-        background-color: #ffffff;
-        border: 28px solid #d93d3d; /* Prominent thick frame */
+        background-color: #d93d3d; /* Outer Frame Base */
         position: relative;
         overflow: hidden;
         display: flex;
         justify-content: center;
         align-items: center;
-        transition: border-color 0.4s ease;
+        padding: 24px; /* Creates the outer colored border on ALL screen sizes */
+        transition: background-color 0.4s ease;
       }
 
-      /* 2x2 Grid Spanning Entire Page */
+      .inner-white-board {
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff;
+        border-radius: 32px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* 2x2 Grid Spanning Page */
       .items-grid {
         width: 100%;
         height: 100%;
@@ -64,8 +128,7 @@
         box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.03);
         transition:
           transform 0.1s ease-in-out,
-          border-color 0.4s ease,
-          box-shadow 0.4s ease;
+          border-color 0.4s ease;
       }
 
       .item:active {
@@ -74,7 +137,7 @@
 
       /* Base emoji scaling */
       .item span.emoji {
-        font-size: min(30vw, 30vh);
+        font-size: min(28vw, 22vh);
         line-height: 1;
         display: flex;
         align-items: center;
@@ -89,7 +152,7 @@
         transform: translate(-50%, -50%);
         background-color: #ffffff;
         color: #d93d3d;
-        font-size: clamp(2.8rem, 9vw, 5.5rem);
+        font-size: clamp(2.4rem, 8vw, 5rem);
         font-weight: 900;
         text-transform: uppercase;
         padding: 12px 36px;
@@ -147,22 +210,20 @@
 
       .next-arrow-btn:active {
         transform: translateY(4px);
-        box-shadow:
-          0 2px 0 rgba(0, 0, 0, 0.2),
-          0 4px 8px rgba(0, 0, 0, 0.25);
       }
 
       /* MOBILE OPTIMIZATIONS */
       @media (max-width: 768px) {
         .color-container {
-          border-width: 18px; /* Thick and clear frame on phone */
+          padding: 16px; /* Outer frame margin on small screens */
+        }
+
+        .inner-white-board {
+          border-radius: 24px;
         }
 
         .items-grid {
-          padding-top: 72px;
-          padding-bottom: 76px;
-          padding-left: 10px;
-          padding-right: 10px;
+          padding: 12px;
           gap: 10px;
         }
 
@@ -172,19 +233,19 @@
         }
 
         .item span.emoji {
-          font-size: min(28vw, 28vh);
+          font-size: min(26vw, 20vh);
         }
 
         .central-text {
-          font-size: clamp(2.2rem, 8.5vw, 3.8rem);
+          font-size: clamp(2rem, 8vw, 3.5rem);
           padding: 8px 24px;
           border-radius: 18px;
         }
 
         .quiz-banner {
           top: 12px;
-          font-size: clamp(1.2rem, 5vw, 1.7rem);
-          padding: 8px 22px;
+          font-size: clamp(1.1rem, 4.8vw, 1.6rem);
+          padding: 8px 20px;
         }
 
         .next-arrow-btn {
@@ -233,23 +294,34 @@
     </style>
   </head>
   <body>
-    <div class="color-container" id="main-frame">
-      <canvas id="confetti-canvas"></canvas>
-
-      <!-- Quiz Question Header -->
-      <div class="quiz-banner" id="quiz-banner">Где красный предмет?</div>
-
-      <!-- Central Word Label -->
-      <div class="central-text" id="central-text">КРАСНЫЙ</div>
-
-      <!-- 4 Objects Grid -->
-      <div class="items-grid" id="items-grid">
-        <!-- Generated dynamically -->
-      </div>
-
-      <!-- Next Arrow -->
-      <button class="next-arrow-btn" id="next-btn" onclick="handleNextClick()">➔</button>
+    <!-- Welcome Entrance Screen -->
+    <div class="welcome-overlay" id="welcome-screen">
+      <div class="welcome-title">Добро пожаловать!</div>
+      <div class="welcome-subtitle">Давай учить цвета вместе!</div>
+      <button class="start-btn" onclick="startGame()">Начать ➔</button>
     </div>
+
+    <!-- Main Game Frame -->
+    <div class="color-container" id="main-frame">
+      <div class="inner-white-board">
+        <canvas id="confetti-canvas"></canvas>
+
+        <!-- Quiz Question Header -->
+        <div class="quiz-banner" id="quiz-banner">Где красный предмет?</div>
+
+        <!-- Central Word Label -->
+        <div class="central-text" id="central-text">КРАСНЫЙ</div>
+
+        <!-- 4 Objects Grid -->
+        <div class="items-grid" id="items-grid">
+          <!-- Generated dynamically -->
+        </div>
+
+        <!-- Next Arrow -->
+        <button class="next-arrow-btn" id="next-btn" onclick="handleNextClick()">➔</button>
+      </div>
+    </div>
+
     <script>
       const colorsData = [
         {
@@ -304,6 +376,11 @@
       let isTransitioning = false;
       let speechTimer = null;
 
+      function startGame() {
+        document.getElementById("welcome-screen").style.display = "none";
+        loadLearnCard(0);
+      }
+
       function speakText(text, callback) {
         if (speechTimer) {
           clearTimeout(speechTimer);
@@ -313,7 +390,6 @@
         if ("speechSynthesis" in window) {
           window.speechSynthesis.cancel();
 
-          // Append punctuation for full/clear word output on mobile browsers
           const formattedText =
             text.trim().endsWith(".") || text.trim().endsWith("?") || text.trim().endsWith("!") ? text : text + ".";
 
@@ -376,7 +452,8 @@
         const banner = document.getElementById("quiz-banner");
         const arrowBtn = document.getElementById("next-btn");
 
-        frame.style.borderColor = data.hex;
+        document.body.style.backgroundColor = data.hex;
+        frame.style.backgroundColor = data.hex;
         centralText.style.color = data.hex;
         centralText.textContent = data.ru;
         centralText.style.display = "block";
@@ -409,7 +486,8 @@
         const banner = document.getElementById("quiz-banner");
         const arrowBtn = document.getElementById("next-btn");
 
-        frame.style.borderColor = targetColor.hex;
+        document.body.style.backgroundColor = targetColor.hex;
+        frame.style.backgroundColor = targetColor.hex;
         centralText.style.display = "none";
         banner.style.display = "block";
         banner.textContent = `Где ${targetColor.ruForm} предмет?`;
@@ -526,10 +604,6 @@
         }
         animate();
       }
-
-      window.addEventListener("load", () => {
-        loadLearnCard(0);
-      });
     </script>
   </body>
 </html>
