@@ -12,12 +12,14 @@
         font-family: "Comic Sans MS", "Chalkboard SE", "Fredoka", cursive, sans-serif;
         user-select: none;
         -webkit-user-select: none;
+        -webkit-tap-highlight-color: transparent;
       }
 
       html,
       body {
         width: 100%;
         height: 100%;
+        height: 100dvh;
         overflow: hidden;
         background-color: #ffffff;
       }
@@ -31,7 +33,7 @@
       /* Dynamic Frame Border */
       .game-container {
         width: 100vw;
-        height: 100vh;
+        height: 100dvh;
         background-color: #ffffff;
         border: 16px solid #d93d3d;
         position: relative;
@@ -60,8 +62,8 @@
 
       /* Single Centered Image Card */
       .hero-image-card {
-        width: min(70vw, 55vh);
-        height: min(70vw, 55vh);
+        width: min(70vw, 45dvh);
+        height: min(70vw, 45dvh);
         border: 8px solid #d93d3d;
         border-radius: 40px;
         display: flex;
@@ -80,7 +82,7 @@
       }
 
       .hero-image-card span.emoji {
-        font-size: min(48vw, 40vh);
+        font-size: min(40vw, 32dvh);
         line-height: 1;
       }
 
@@ -172,6 +174,35 @@
         transform: translate(-50%, -50%) scale(1);
       }
 
+      /* Start Overlay for Mobile Autoplay & Mic Permission */
+      .start-overlay {
+        position: fixed;
+        inset: 0;
+        background-color: #ffffff;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .start-btn {
+        background-color: #22c55e;
+        color: white;
+        border: none;
+        padding: 18px 48px;
+        font-size: 2rem;
+        font-weight: 900;
+        border-radius: 50px;
+        box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
+        cursor: pointer;
+      }
+
+      .start-btn:active {
+        transform: scale(0.95);
+      }
+
       /* Confetti Canvas */
       #confetti-canvas {
         position: absolute;
@@ -185,6 +216,11 @@
     </style>
   </head>
   <body>
+    <!-- Start Screen Overlay required by mobile browsers for Audio/Mic permission -->
+    <div class="start-overlay" id="start-overlay">
+      <button class="start-btn" onclick="startGame()">ИГРАТЬ</button>
+    </div>
+
     <div class="game-container" id="game-frame">
       <canvas id="confetti-canvas"></canvas>
 
@@ -207,7 +243,6 @@
     </div>
 
     <script>
-      // Exactly 4 cards with custom prompts & wrong answers dataset
       const speechItems = [
         {
           promptText: "Какой это цвет?",
@@ -247,8 +282,18 @@
       let isTransitioning = false;
       let recognition = null;
       let speechTimer = null;
+      let audioCtx = null;
 
-      // Safe Audio Speech Output
+      function getAudioContext() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+        return audioCtx;
+      }
+
       function speakText(text, callback) {
         if (speechTimer) {
           clearTimeout(speechTimer);
@@ -268,10 +313,9 @@
         }
       }
 
-      // Play Victory Chime
       function playCorrectSound() {
         try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const ctx = getAudioContext();
           const notes = [523.25, 659.25, 783.99, 1046.5];
           notes.forEach((freq, index) => {
             const osc = ctx.createOscillator();
@@ -289,10 +333,9 @@
         } catch (e) {}
       }
 
-      // Play Gentle Wrong Selection Sound
       function playWrongSound() {
         try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const ctx = getAudioContext();
           const playNote = (freq, startTime, duration) => {
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
@@ -310,7 +353,6 @@
         } catch (e) {}
       }
 
-      // Speech Recognition Setup
       function initSpeechRecognition() {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -331,14 +373,12 @@
             const transcript = event.results[i][0].transcript.toLowerCase().trim();
             const currentItem = speechItems[currentIndex];
 
-            // Check correct answer
             const isCorrect = currentItem.correctKeywords.some((keyword) => transcript.includes(keyword));
             if (isCorrect) {
               triggerSuccess();
               break;
             }
 
-            // Check wrong answer
             const isWrong = currentItem.wrongKeywords.some((keyword) => transcript.includes(keyword));
             if (isWrong) {
               triggerWrong();
@@ -364,7 +404,6 @@
         } catch (e) {}
       }
 
-      // Display Card & Pronounce Prompt
       function loadCard(index) {
         isTransitioning = false;
         const item = speechItems[index];
@@ -379,16 +418,12 @@
         card.style.borderColor = item.hex;
         emoji.textContent = item.emoji;
 
-        // Set top prompt: 1&2 = "Какой это цвет?", 3&4 = "А это?"
         promptBanner.textContent = item.promptText;
-
         toast.classList.remove("show");
 
-        // Speak the matching prompt aloud
         speakText(item.promptText);
       }
 
-      // Trigger Correct Answer Sequence
       function triggerSuccess() {
         if (isTransitioning) return;
         isTransitioning = true;
@@ -411,7 +446,6 @@
         });
       }
 
-      // Trigger Wrong Answer Sequence
       function triggerWrong() {
         if (isTransitioning) return;
         isTransitioning = true;
@@ -428,20 +462,18 @@
         });
       }
 
-      // Tap on Card Fallback
       function handleCardTap() {
+        getAudioContext();
         if (!isTransitioning) {
           triggerSuccess();
         }
       }
 
-      // Move to Next Card or Finish
       function advanceGame() {
         currentIndex++;
         if (currentIndex < speechItems.length) {
           loadCard(currentIndex);
         } else {
-          // Final Game Finish Screen (Does NOT redirect to index.html)
           isTransitioning = true;
           triggerConfetti();
 
@@ -456,7 +488,6 @@
         }
       }
 
-      // Confetti Effect
       function triggerConfetti() {
         const canvas = document.getElementById("confetti-canvas");
         const ctx = canvas.getContext("2d");
@@ -497,10 +528,12 @@
         animate();
       }
 
-      window.addEventListener("load", () => {
+      function startGame() {
+        getAudioContext();
+        document.getElementById("start-overlay").style.display = "none";
         loadCard(0);
         initSpeechRecognition();
-      });
+      }
     </script>
   </body>
 </html>
