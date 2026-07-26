@@ -370,12 +370,23 @@
         },
       ];
 
-      let gameState = "LEARN"; // "LEARN" or "QUIZ"
+      let gameState = "LEARN";
       let currentIndex = 0;
       let quizTargetObject = null;
       let isTransitioning = false;
+      let audioCtx = null;
+
+      function initAudio() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+      }
 
       function startGame() {
+        initAudio();
         document.getElementById("welcome-screen").style.display = "none";
         loadLearnCard(0);
       }
@@ -383,16 +394,13 @@
       function speakText(text) {
         if ("speechSynthesis" in window) {
           try {
-            window.speechSynthesis.cancel(); // clear previous audio
-
+            window.speechSynthesis.cancel();
             const formattedText =
               text.trim().endsWith(".") || text.trim().endsWith("?") || text.trim().endsWith("!") ? text : text + ".";
-
             const utterance = new SpeechSynthesisUtterance(formattedText);
             utterance.lang = "ru-RU";
-            utterance.rate = 0.8;
+            utterance.rate = 0.85;
             utterance.pitch = 1.1;
-
             window.speechSynthesis.speak(utterance);
           } catch (e) {}
         }
@@ -400,38 +408,38 @@
 
       function playWrongSound() {
         try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          initAudio();
           const playNote = (freq, startTime, duration) => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
             osc.type = "sine";
             osc.frequency.setValueAtTime(freq, startTime);
             gain.gain.setValueAtTime(0.2, startTime);
             gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
             osc.connect(gain);
-            gain.connect(ctx.destination);
+            gain.connect(audioCtx.destination);
             osc.start(startTime);
             osc.stop(startTime + duration);
           };
-          playNote(260, ctx.currentTime, 0.12);
-          playNote(220, ctx.currentTime + 0.12, 0.18);
+          playNote(260, audioCtx.currentTime, 0.12);
+          playNote(220, audioCtx.currentTime + 0.12, 0.18);
         } catch (e) {}
       }
 
       function playCorrectSound() {
         try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          initAudio();
           const notes = [523.25, 659.25, 783.99, 1046.5];
           notes.forEach((freq, index) => {
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            const startTime = ctx.currentTime + index * 0.08;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const startTime = audioCtx.currentTime + index * 0.08;
             osc.type = "triangle";
             osc.frequency.setValueAtTime(freq, startTime);
             gain.gain.setValueAtTime(0.25, startTime);
             gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
             osc.connect(gain);
-            gain.connect(ctx.destination);
+            gain.connect(audioCtx.destination);
             osc.start(startTime);
             osc.stop(startTime + 0.25);
           });
@@ -489,11 +497,14 @@
 
         speakText(`Где ${targetColor.ruForm} предмет?`);
 
+        // Pick 1 correct target object belonging to targetColor
         quizTargetObject = targetColor.objects[Math.floor(Math.random() * targetColor.objects.length)];
 
+        // Pick 1 random object from EACH of the other colors
         const otherColors = colorsData.filter((_, i) => i !== index);
         const wrongObjs = otherColors.map((c) => c.objects[Math.floor(Math.random() * c.objects.length)]);
 
+        // Shuffle all 4 choices
         const allChoices = [quizTargetObject, ...wrongObjs].sort(() => Math.random() - 0.5);
 
         const grid = document.getElementById("items-grid");
@@ -512,16 +523,16 @@
       function handleQuizChoice(selectedObj, elem, targetColor) {
         if (isTransitioning) return;
 
+        // Strict name matching
         if (selectedObj.name === quizTargetObject.name) {
           isTransitioning = true;
           triggerConfetti();
           playCorrectSound();
           speakText("Ты угадал!");
 
-          // Fixed: Use a reliable setTimeout delay instead of relying on speech callbacks
           setTimeout(() => {
             advanceQuiz();
-          }, 1200);
+          }, 1400);
         } else {
           playWrongSound();
           elem.classList.add("shake");
