@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Уровни Цветов</title>
+    <!-- Kid-friendly font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Fredoka", "Comic Sans MS", cursive, sans-serif;
+      }
+
+      body {
+        background-color: #e0f7fa;
+        background-image: radial-gradient(#b2ebf2 2px, transparent 2px);
+        background-size: 20px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 24px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        border: 4px solid #4dd0e1;
+        max-width: 450px;
+        width: 100%;
+        text-align: center;
+      }
+
+      h1 {
+        font-size: 26px;
+        color: #ff4081;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 0px #ffe0b2;
+      }
+
+      /* Top Navigation Buttons */
+      .nav-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+
+      .nav-btn {
+        padding: 10px 14px;
+        border: none;
+        background-color: #ffd54f;
+        color: #4e342e;
+        border-radius: 50px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 4px 0 #f57f17;
+        transition: all 0.1s ease;
+      }
+
+      .nav-btn:hover {
+        background-color: #ffe082;
+        transform: translateY(-2px);
+      }
+
+      .nav-btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 #f57f17;
+      }
+
+      .nav-btn.active {
+        background-color: #ff6090;
+        color: #ffffff;
+        box-shadow: 0 4px 0 #c2185b;
+      }
+
+      /* Main Display Area */
+      .level-card {
+        background: #fff9c4;
+        border: 3px dashed #fbc02d;
+        border-radius: 20px;
+        padding: 20px;
+      }
+
+      .level-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #7b1fa2;
+        margin-bottom: 5px;
+      }
+
+      .level-subtitle {
+        font-size: 14px;
+        color: #616161;
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      /* Colors Stacked Top to Bottom */
+      .color-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .color-box {
+        padding: 18px;
+        border-radius: 16px;
+        font-size: 22px;
+        font-weight: 700;
+        box-shadow: 0 6px 0 rgba(0, 0, 0, 0.15);
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.1s ease;
+      }
+
+      .color-box:active {
+        transform: scale(0.97);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎨 Уровни Цветов 🎨</h1>
+
+      <!-- Level Buttons -->
+      <div class="nav-buttons">
+        <button class="nav-btn active" onclick="showLevel(1)">Уровень 1</button>
+        <button class="nav-btn" onclick="showLevel(2)">Уровень 2</button>
+        <button class="nav-btn" onclick="showLevel(3)">Уровень 3</button>
+        <button class="nav-btn" onclick="showLevel(4)">Уровень 4</button>
+        <button class="nav-btn" onclick="showLevel(5)">Уровень 5</button>
+      </div>
+
+      <!-- Main Display -->
+      <div class="level-card">
+        <div class="level-title" id="level-heading">⭐ Уровень 1 ⭐</div>
+        <div class="level-subtitle" id="level-sub">Базовые цвета</div>
+
+        <!-- Top-to-Bottom Vertical Stack -->
+        <div class="color-stack" id="color-stack">
+          <!-- JS dynamic content -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const synth = window.speechSynthesis;
+      let welcomeSpoken = false;
+
+      // Helper to pronounce Russian text
+      function speakText(text) {
+        if (!synth) return;
+        synth.cancel(); // Stop ongoing speech
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "ru-RU";
+        utterance.rate = 0.9; // Friendly pace for kids
+        synth.speak(utterance);
+      }
+
+      // Auto-welcome message in Russian
+      function playWelcome() {
+        if (!welcomeSpoken) {
+          welcomeSpoken = true;
+          speakText("Привет! Добро пожаловать в Изучение Цветов!");
+        }
+      }
+
+      // Try playing immediately on load
+      window.addEventListener("load", () => {
+        // Small timeout allows SpeechSynthesis voices to load
+        setTimeout(playWelcome, 500);
+      });
+
+      // Fallback: If browser blocks autoplay, speak on the very first touch/click
+      document.addEventListener(
+        "click",
+        () => {
+          if (!welcomeSpoken) {
+            playWelcome();
+          }
+        },
+        { once: true },
+      );
+
+      // All 20 colors split into 5 levels
+      const levelsData = {
+        1: {
+          title: "⭐ Уровень 1 ⭐",
+          subtitle: "Базовые цвета",
+          colors: [
+            { ru: "Красный", display: "Красный 🔴", bg: "#f44336", border: "#c62828", textLight: true },
+            { ru: "Синий", display: "Синий 🔵", bg: "#2196f3", border: "#1565c0", textLight: true },
+            { ru: "Зелёный", display: "Зелёный 🟢", bg: "#4caf50", border: "#2e7d32", textLight: true },
+            { ru: "Жёлтый", display: "Жёлтый 🟡", bg: "#ffeb3b", border: "#fbc02d", textLight: false },
+          ],
+        },
+        2: {
+          title: "⭐ Уровень 2 ⭐",
+          subtitle: "Яркие цвета",
+          colors: [
+            { ru: "Оранжевый", display: "Оранжевый 🟠", bg: "#ff9800", border: "#e65100", textLight: true },
+            { ru: "Фиолетовый", display: "Фиолетовый 🟣", bg: "#9c27b0", border: "#6a1b9a", textLight: true },
+            { ru: "Розовый", display: "Розовый 🩷", bg: "#ff4081", border: "#c2185b", textLight: true },
+            { ru: "Коричневый", display: "Коричневый 🟤", bg: "#795548", border: "#4e342e", textLight: true },
+          ],
+        },
+        3: {
+          title: "⭐ Уровень 3 ⭐",
+          subtitle: "Контрастные цвета",
+          colors: [
+            { ru: "Чёрный", display: "Чёрный 🖤", bg: "#212121", border: "#000000", textLight: true },
+            { ru: "Белый", display: "Белый 🤍", bg: "#ffffff", border: "#e0e0e0", textLight: false },
+            { ru: "Серый", display: "Серый 🩶", bg: "#9e9e9e", border: "#616161", textLight: true },
+            { ru: "Голубой", display: "Голубой 🩵", bg: "#00bcd4", border: "#00838f", textLight: true },
+          ],
+        },
+        4: {
+          title: "⭐ Уровень 4 ⭐",
+          subtitle: "Продвинутые оттенки",
+          colors: [
+            { ru: "Пурпурный", display: "Пурпурный 🌺", bg: "#e91e63", border: "#ad1457", textLight: true },
+            { ru: "Лаймовый", display: "Лаймовый 🍋‍🟩", bg: "#cddc39", border: "#afb42b", textLight: false },
+            { ru: "Бирюзовый", display: "Бирюзовый 🌊", bg: "#009688", border: "#004d40", textLight: true },
+            { ru: "Тёмно-синий", display: "Тёмно-синий 🌌", bg: "#1a237e", border: "#000051", textLight: true },
+          ],
+        },
+        5: {
+          title: "⭐ Уровень 5 ⭐",
+          subtitle: "Сложные и благородные цвета",
+          colors: [
+            { ru: "Бордовый", display: "Бордовый 🍒", bg: "#880e4f", border: "#4a0072", textLight: true },
+            { ru: "Оливковый", display: "Оливковый 🫒", bg: "#558b2f", border: "#33691e", textLight: true },
+            { ru: "Золотой", display: "Золотой 👑", bg: "#ffc107", border: "#ff8f00", textLight: false },
+            { ru: "Серебристый", display: "Серебристый 🪙", bg: "#b0bec5", border: "#78909c", textLight: false },
+          ],
+        },
+      };
+
+      function showLevel(levelNumber) {
+        const data = levelsData[levelNumber];
+
+        // Update Header Text
+        document.getElementById("level-heading").innerText = data.title;
+        document.getElementById("level-sub").innerText = data.subtitle;
+
+        // Update Navigation Buttons Active State
+        const buttons = document.querySelectorAll(".nav-btn");
+        buttons.forEach((btn, index) => {
+          if (index + 1 === levelNumber) {
+            btn.classList.add("active");
+          } else {
+            btn.classList.remove("active");
+          }
+        });
+
+        // Render Vertical Stack
+        const stack = document.getElementById("color-stack");
+        stack.innerHTML = "";
+
+        data.colors.forEach((item) => {
+          const box = document.createElement("div");
+          box.className = "color-box";
+          box.style.backgroundColor = item.bg;
+          box.style.borderBottom = `4px solid ${item.border}`;
+          box.innerText = item.display;
+
+          if (!item.textLight) {
+            box.style.color = "#212121";
+            box.style.textShadow = "none";
+          } else {
+            box.style.color = "#ffffff";
+            box.style.textShadow = "1px 2px 3px rgba(0, 0, 0, 0.4)";
+          }
+
+          // Play audio of the color name in Russian on click
+          box.onclick = () => speakText(item.ru);
+
+          stack.appendChild(box);
+        });
+      }
+
+      // Load Level 1 on start
+      showLevel(1);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Учим Цвета — Уровень 2</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Comic Sans MS", "Chalkboard SE", "Fredoka", cursive, sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: #f97316;
+        transition: background-color 0.4s ease;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .welcome-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, #a855f7 0%, #f472b6 100%);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 24px;
+      }
+
+      .welcome-title {
+        color: #ffffff;
+        font-size: clamp(2.2rem, 7vw, 4rem);
+        font-weight: 900;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        margin-bottom: 12px;
+      }
+
+      .welcome-subtitle {
+        color: #f3e8ff;
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+        font-weight: 700;
+        margin-bottom: 32px;
+      }
+
+      .level-indicator {
+        background-color: rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+        padding: 8px 24px;
+        border-radius: 30px;
+        font-size: clamp(1rem, 3.5vw, 1.4rem);
+        font-weight: 800;
+        margin-bottom: 24px;
+      }
+
+      .start-btn {
+        background-color: #22c55e;
+        color: #ffffff;
+        border: 4px solid #ffffff;
+        font-size: clamp(1.6rem, 5.5vw, 2.5rem);
+        font-weight: 900;
+        padding: 16px 48px;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        transition: transform 0.1s ease;
+      }
+
+      .start-btn:active {
+        transform: scale(0.95);
+      }
+
+      .color-container {
+        width: 100vw;
+        height: 100vh;
+        background-color: #f97316;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 30px;
+        transition: background-color 0.4s ease;
+      }
+
+      .inner-white-board {
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff;
+        border-radius: 28px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .items-grid {
+        width: 100%;
+        height: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 16px;
+        padding: 16px;
+      }
+
+      .item {
+        border: 6px solid #f97316;
+        border-radius: 28px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        background-color: #ffffff;
+        box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.03);
+        transition:
+          transform 0.1s ease-in-out,
+          border-color 0.4s ease;
+      }
+
+      .item:active {
+        transform: scale(0.97);
+      }
+
+      .item span.emoji {
+        font-size: min(28vw, 22vh);
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .central-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #ffffff;
+        color: #f97316;
+        font-size: clamp(2.2rem, 7vw, 4.5rem);
+        font-weight: 900;
+        text-transform: uppercase;
+        padding: 12px 36px;
+        border-radius: 24px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        pointer-events: none;
+        z-index: 10;
+        text-align: center;
+        white-space: nowrap;
+        transition: color 0.4s ease;
+      }
+
+      .quiz-banner {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #ffffff;
+        color: #1e293b;
+        font-size: clamp(1.4rem, 4.5vw, 2.2rem);
+        font-weight: 900;
+        padding: 12px 32px;
+        border-radius: 36px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        z-index: 12;
+        display: none;
+        white-space: nowrap;
+      }
+
+      .next-arrow-btn {
+        position: absolute;
+        bottom: 24px;
+        right: 24px;
+        background: #f97316;
+        color: #ffffff;
+        border: 4px solid #ffffff;
+        border-radius: 50%;
+        width: 76px;
+        height: 76px;
+        font-size: 2.8rem;
+        cursor: pointer;
+        box-shadow:
+          0 6px 0 rgba(0, 0, 0, 0.2),
+          0 8px 16px rgba(0, 0, 0, 0.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 20;
+        transition:
+          background-color 0.4s ease,
+          transform 0.1s ease;
+      }
+
+      .next-arrow-btn:active {
+        transform: translateY(4px);
+      }
+
+      @media (max-width: 768px) {
+        .color-container {
+          padding: 30px !important;
+        }
+
+        .inner-white-board {
+          border-radius: 20px;
+        }
+
+        .items-grid {
+          padding: 10px;
+          gap: 10px;
+        }
+
+        .item {
+          border-width: 4px;
+          border-radius: 18px;
+        }
+
+        .item span.emoji {
+          font-size: min(24vw, 18vh);
+        }
+
+        .central-text {
+          font-size: clamp(1.6rem, 6.5vw, 3rem);
+          padding: 8px 20px;
+          border-radius: 16px;
+        }
+
+        .quiz-banner {
+          top: 10px;
+          font-size: clamp(1rem, 4.2vw, 1.4rem);
+          padding: 6px 16px;
+        }
+
+        .next-arrow-btn {
+          width: 60px;
+          height: 60px;
+          font-size: 2rem;
+          bottom: 12px;
+          right: 12px;
+        }
+      }
+
+      .shake {
+        animation: shakeAnim 0.4s ease;
+      }
+
+      @keyframes shakeAnim {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-10px);
+        }
+        40% {
+          transform: translateX(10px);
+        }
+        60% {
+          transform: translateX(-6px);
+        }
+        80% {
+          transform: translateX(6px);
+        }
+      }
+
+      #confetti-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 30;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="welcome-overlay" id="welcome-screen">
+      <div class="welcome-title">Отличная работа!</div>
+      <div class="level-indicator">Уровни 1–5 (20 Цветов)</div>
+      <div class="welcome-subtitle">Впереди ещё больше новых цветов!</div>
+      <button class="start-btn" onclick="startGame()">Продолжить ➔</button>
+    </div>
+
+    <div class="color-container" id="main-frame">
+      <div class="inner-white-board">
+        <canvas id="confetti-canvas"></canvas>
+
+        <div class="quiz-banner" id="quiz-banner">Где предмет?</div>
+
+        <div class="central-text" id="central-text">ЦВЕТ</div>
+
+        <div class="items-grid" id="items-grid"></div>
+
+        <button class="next-arrow-btn" id="next-btn" onclick="handleNextClick()">➔</button>
+      </div>
+    </div>
+
+    <script>
+      // 5 Levels, 4 Colors per Level = 20 Colors Total
+      const levelsData = [
+        // LEVEL 1: Яркие базовые цвета
+        [
+          {
+            ru: "Оранжевый",
+            ruForm: "оранжевый",
+            hex: "#f97316",
+            colorAudio: "audio/color_orange.mp3",
+            quizAudio: "audio/quiz_orange.mp3",
+            objects: [
+              { emoji: "🍊", name: "Апельсин", audio: "audio/orange.mp3" },
+              { emoji: "🦊", name: "Лиса", audio: "audio/fox.mp3" },
+              { emoji: "🥕", name: "Морковь", audio: "audio/carrot.mp3" },
+              { emoji: "🎃", name: "Тыква", audio: "audio/pumpkin.mp3" },
+            ],
+          },
+          {
+            ru: "Фиолетовый",
+            ruForm: "фиолетовый",
+            hex: "#9333ea",
+            colorAudio: "audio/color_purple.mp3",
+            quizAudio: "audio/quiz_purple.mp3",
+            objects: [
+              { emoji: "🍇", name: "Виноград", audio: "audio/grapes.mp3" },
+              { emoji: "🍆", name: "Баклажан", audio: "audio/eggplant.mp3" },
+              { emoji: "🔮", name: "Шар", audio: "audio/crystal_ball.mp3" },
+              { emoji: "👾", name: "Монстрик", audio: "audio/monster.mp3" },
+            ],
+          },
+          {
+            ru: "Розовый",
+            ruForm: "розовый",
+            hex: "#ec4899",
+            colorAudio: "audio/color_pink.mp3",
+            quizAudio: "audio/quiz_pink.mp3",
+            objects: [
+              { emoji: "🦩", name: "Фламинго", audio: "audio/flamingo.mp3" },
+              { emoji: "🦛", name: "Бегемотик", audio: "audio/hippo.mp3" },
+              { emoji: "🌸", name: "Цветок", audio: "audio/blossom.mp3" },
+              { emoji: "ドーナツ", name: "Пончик", audio: "audio/donut.mp3" },
+            ],
+          },
+          {
+            ru: "Коричневый",
+            ruForm: "коричневый",
+            hex: "#854d0e",
+            colorAudio: "audio/color_brown.mp3",
+            quizAudio: "audio/quiz_brown.mp3",
+            objects: [
+              { emoji: "🐻", name: "Мишка", audio: "audio/bear.mp3" },
+              { emoji: "🍫", name: "Шоколад", audio: "audio/chocolate.mp3" },
+              { emoji: "🥔", name: "Картошка", audio: "audio/potato.mp3" },
+              { emoji: "🌰", name: "Каштан", audio: "audio/chestnut.mp3" },
+            ],
+          },
+        ],
+
+        // LEVEL 2: Морские и природные цвета
+        [
+          {
+            ru: "Бирюзовый",
+            ruForm: "бирюзовый",
+            hex: "#0d9488",
+            colorAudio: "audio/color_turquoise.mp3",
+            quizAudio: "audio/quiz_turquoise.mp3",
+            objects: [
+              { emoji: "💎", name: "Кристалл", audio: "audio/gem.mp3" },
+              { emoji: "🦚", name: "Павлин", audio: "audio/peacock.mp3" },
+              { emoji: "🏝️", name: "Остров", audio: "audio/island.mp3" },
+              { emoji: "🐬", name: "Дельфин", audio: "audio/dolphin.mp3" },
+            ],
+          },
+          {
+            ru: "Салатовый",
+            ruForm: "салатовый",
+            hex: "#84cc16",
+            colorAudio: "audio/color_lime.mp3",
+            quizAudio: "audio/quiz_lime.mp3",
+            objects: [
+              { emoji: "🍏", name: "Яблоко", audio: "audio/green_apple.mp3" },
+              { emoji: "🐸", name: "Лягушка", audio: "audio/frog.mp3" },
+              { emoji: "PEAR", name: "Груша", audio: "audio/pear.mp3" },
+              { emoji: "CATERPILLAR", name: "Гусеница", audio: "audio/caterpillar.mp3" },
+            ],
+          },
+          {
+            ru: "Серый",
+            ruForm: "серый",
+            hex: "#64748b",
+            colorAudio: "audio/color_grey.mp3",
+            quizAudio: "audio/quiz_grey.mp3",
+            objects: [
+              { emoji: "🐘", name: "Слон", audio: "audio/elephant.mp3" },
+              { emoji: "🐨", name: "Коала", audio: "audio/koala.mp3" },
+              { emoji: "🐭", name: "Мышка", audio: "audio/mouse.mp3" },
+              { emoji: "🦏", name: "Носорог", audio: "audio/rhino.mp3" },
+            ],
+          },
+          {
+            ru: "Чёрный",
+            ruForm: "чёрный",
+            hex: "#1e293b",
+            colorAudio: "audio/color_black.mp3",
+            quizAudio: "audio/quiz_black.mp3",
+            objects: [
+              { emoji: "🐈‍⬛", name: "Кот", audio: "audio/black_cat.mp3" },
+              { emoji: "💣", name: "Бомбочка", audio: "audio/bomb.mp3" },
+              { emoji: "🕷️", name: "Паук", audio: "audio/spider.mp3" },
+              { emoji: "🕶️", name: "Очки", audio: "audio/glasses.mp3" },
+            ],
+          },
+        ],
+
+        // LEVEL 3: Нежные пастельные цвета
+        [
+          {
+            ru: "Бежевый",
+            ruForm: "бежевый",
+            hex: "#d97706",
+            colorAudio: "audio/color_beige.mp3",
+            quizAudio: "audio/quiz_beige.mp3",
+            objects: [
+              { emoji: "🐪", name: "Верблюд", audio: "audio/camel.mp3" },
+              { emoji: "🍞", name: "Хлеб", audio: "audio/bread.mp3" },
+              { emoji: "🌾", name: "Колос", audio: "audio/wheat.mp3" },
+              { emoji: "🍪", name: "Печенье", audio: "audio/cookie.mp3" },
+            ],
+          },
+          {
+            ru: "Сиреневый",
+            ruForm: "сиреневый",
+            hex: "#a855f7",
+            colorAudio: "audio/color_violet.mp3",
+            quizAudio: "audio/quiz_violet.mp3",
+            objects: [
+              { emoji: "🪻", name: "Гиацинт", audio: "audio/flower_hyacinth.mp3" },
+              { emoji: "🦄", name: "Единорог", audio: "audio/unicorn.mp3" },
+              { emoji: "🍬", name: "Конфета", audio: "audio/candy.mp3" },
+              { emoji: "☂️", name: "Зонтик", audio: "audio/umbrella.mp3" },
+            ],
+          },
+          {
+            ru: "Оливковый",
+            ruForm: "оливковый",
+            hex: "#65a30d",
+            colorAudio: "audio/color_olive.mp3",
+            quizAudio: "audio/quiz_olive.mp3",
+            objects: [
+              { emoji: "🫒", name: "Оливка", audio: "audio/olive.mp3" },
+              { emoji: "🥑", name: "Авокадо", audio: "audio/avocado.mp3" },
+              { emoji: "🫑", name: "Перец", audio: "audio/pepper.mp3" },
+              { emoji: "Turtle", name: "Черепаха", audio: "audio/turtle.mp3" },
+            ],
+          },
+          {
+            ru: "Пурпурный",
+            ruForm: "пурпурный",
+            hex: "#c026d3",
+            colorAudio: "audio/color_magenta.mp3",
+            quizAudio: "audio/quiz_magenta.mp3",
+            objects: [
+              { emoji: "🌺", name: "Гибискус", audio: "audio/hibiscus.mp3" },
+              { emoji: "🔮", name: "Магия", audio: "audio/magic.mp3" },
+              { emoji: "🪀", name: "Йо-йо", audio: "audio/yoyo.mp3" },
+              { emoji: "👑", name: "Корона", audio: "audio/crown.mp3" },
+            ],
+          },
+        ],
+
+        // LEVEL 4: Водные и светлые оттенки
+        [
+          {
+            ru: "Голубой",
+            ruForm: "голубой",
+            hex: "#06b6d4",
+            colorAudio: "audio/color_cyan.mp3",
+            quizAudio: "audio/quiz_cyan.mp3",
+            objects: [
+              { emoji: "💧", name: "Капля", audio: "audio/drop.mp3" },
+              { emoji: "❄️", name: "Снежинка", audio: "audio/snowflake.mp3" },
+              { emoji: "🧊", name: "Лёд", audio: "audio/ice.mp3" },
+              { emoji: "🌧️", name: "Тучка", audio: "audio/cloud.mp3" },
+            ],
+          },
+          {
+            ru: "Золотой",
+            ruForm: "золотой",
+            hex: "#ca8a04",
+            colorAudio: "audio/color_gold.mp3",
+            quizAudio: "audio/quiz_gold.mp3",
+            objects: [
+              { emoji: "🏆", name: "Кубок", audio: "audio/trophy.mp3" },
+              { emoji: "🥇", name: "Медаль", audio: "audio/medal.mp3" },
+              { emoji: "👑", name: "Корона", audio: "audio/gold_crown.mp3" },
+              { emoji: "⭐", name: "Звезда", audio: "audio/star.mp3" },
+            ],
+          },
+          {
+            ru: "Коралл",
+            ruForm: "коралловый",
+            hex: "#f43f5e",
+            colorAudio: "audio/color_coral.mp3",
+            quizAudio: "audio/quiz_coral.mp3",
+            objects: [
+              { emoji: "🪸", name: "Коралл", audio: "audio/coral.mp3" },
+              { emoji: "🦐", name: "Креветка", audio: "audio/shrimp.mp3" },
+              { emoji: "🦩", name: "Птичка", audio: "audio/coral_bird.mp3" },
+              { emoji: "🦪", name: "Ракушка", audio: "audio/shell.mp3" },
+            ],
+          },
+          {
+            ru: "Мятный",
+            ruForm: "мятный",
+            hex: "#10b981",
+            colorAudio: "audio/color_mint.mp3",
+            quizAudio: "audio/quiz_mint.mp3",
+            objects: [
+              { emoji: "🌿", name: "Мята", audio: "audio/mint_leaf.mp3" },
+              { emoji: "🍦", name: "Мороженое", audio: "audio/ice_cream.mp3" },
+              { emoji: "🌱", name: "Росток", audio: "audio/sprout.mp3" },
+              { emoji: "🍵", name: "Чай", audio: "audio/green_tea.mp3" },
+            ],
+          },
+        ],
+      ];
+
+      let currentLevel = 0;
+      let currentColorInLevel = 0;
+      let gameState = "LEARN"; // "LEARN" or "QUIZ"
+      let quizTargetObject = null;
+      let isTransitioning = false;
+      let audioCtx = null;
+      let currentPlayingAudio = null;
+
+      function getCurrentColor() {
+        return levelsData[currentLevel][currentColorInLevel];
+      }
+
+      function playRecordedAudio(audioPath, callback) {
+        if (currentPlayingAudio) {
+          currentPlayingAudio.pause();
+          currentPlayingAudio.currentTime = 0;
+        }
+        currentPlayingAudio = new Audio(audioPath);
+        if (callback) {
+          currentPlayingAudio.onended = callback;
+        }
+        currentPlayingAudio.play().catch(() => {
+          if (callback) callback();
+        });
+      }
+
+      function initAudio() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume();
+        }
+      }
+
+      function startGame() {
+        initAudio();
+        document.getElementById("welcome-screen").style.display = "none";
+        loadLearnCard();
+      }
+
+      function playWrongSound() {
+        try {
+          initAudio();
+          const playNote = (freq, startTime, duration) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(0.2, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + duration);
+          };
+          playNote(260, audioCtx.currentTime, 0.12);
+          playNote(220, audioCtx.currentTime + 0.12, 0.18);
+        } catch (e) {}
+      }
+
+      function playCorrectSound() {
+        try {
+          initAudio();
+          const notes = [523.25, 659.25, 783.99, 1046.5];
+          notes.forEach((freq, index) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const startTime = audioCtx.currentTime + index * 0.08;
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(freq, startTime);
+            gain.gain.setValueAtTime(0.25, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(startTime);
+            osc.stop(startTime + 0.25);
+          });
+        } catch (e) {}
+      }
+
+      function loadLearnCard() {
+        isTransitioning = false;
+        const data = getCurrentColor();
+        const frame = document.getElementById("main-frame");
+        const centralText = document.getElementById("central-text");
+        const banner = document.getElementById("quiz-banner");
+        const arrowBtn = document.getElementById("next-btn");
+
+        document.body.style.backgroundColor = data.hex;
+        frame.style.backgroundColor = data.hex;
+        centralText.style.color = data.hex;
+        centralText.textContent = data.ru;
+        centralText.style.display = "block";
+        banner.style.display = "none";
+
+        arrowBtn.style.backgroundColor = data.hex;
+        arrowBtn.style.display = "flex";
+
+        const grid = document.getElementById("items-grid");
+        grid.innerHTML = "";
+
+        data.objects.forEach((obj) => {
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "item";
+          itemDiv.style.borderColor = data.hex;
+          itemDiv.innerHTML = `<span class="emoji">${obj.emoji}</span>`;
+          itemDiv.onclick = () => playRecordedAudio(obj.audio);
+          grid.appendChild(itemDiv);
+        });
+
+        playRecordedAudio(data.colorAudio);
+      }
+
+      function loadQuizCard() {
+        isTransitioning = false;
+        const targetColor = getCurrentColor();
+        const frame = document.getElementById("main-frame");
+        const centralText = document.getElementById("central-text");
+        const banner = document.getElementById("quiz-banner");
+        const arrowBtn = document.getElementById("next-btn");
+
+        document.body.style.backgroundColor = targetColor.hex;
+        frame.style.backgroundColor = targetColor.hex;
+        centralText.style.display = "none";
+        banner.style.display = "block";
+        banner.textContent = `Где ${targetColor.ruForm} предмет?`;
+
+        arrowBtn.style.display = "none";
+
+        playRecordedAudio(targetColor.quizAudio);
+
+        quizTargetObject = targetColor.objects[Math.floor(Math.random() * targetColor.objects.length)];
+
+        // Select wrong choices from other colors in the current level
+        const currentLevelColors = levelsData[currentLevel];
+        const otherColors = currentLevelColors.filter((_, i) => i !== currentColorInLevel);
+        const wrongObjs = otherColors.map((c) => c.objects[Math.floor(Math.random() * c.objects.length)]);
+
+        const allChoices = [quizTargetObject, ...wrongObjs].sort(() => Math.random() - 0.5);
+
+        const grid = document.getElementById("items-grid");
+        grid.innerHTML = "";
+
+        allChoices.forEach((obj) => {
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "item";
+          itemDiv.style.borderColor = targetColor.hex;
+          itemDiv.innerHTML = `<span class="emoji">${obj.emoji}</span>`;
+          itemDiv.onclick = () => handleQuizChoice(obj, itemDiv);
+          grid.appendChild(itemDiv);
+        });
+      }
+
+      function handleQuizChoice(selectedObj, elem) {
+        if (isTransitioning) return;
+
+        if (selectedObj.name === quizTargetObject.name) {
+          isTransitioning = true;
+          triggerConfetti();
+          playCorrectSound();
+          playRecordedAudio("audio/win.mp3");
+
+          setTimeout(() => {
+            advanceProgression();
+          }, 1400);
+        } else {
+          playWrongSound();
+          elem.classList.add("shake");
+          setTimeout(() => elem.classList.remove("shake"), 400);
+        }
+      }
+
+      function advanceProgression() {
+        currentColorInLevel++;
+
+        if (currentColorInLevel >= levelsData[currentLevel].length) {
+          // Finished level quiz
+          currentColorInLevel = 0;
+          currentLevel++;
+
+          if (currentLevel >= levelsData.length) {
+            alert("Поздравляем! Вы прошли все 5 уровней!");
+            window.location.reload();
+            return;
+          }
+
+          gameState = "LEARN";
+          loadLearnCard();
+        } else {
+          if (gameState === "LEARN") {
+            loadLearnCard();
+          } else {
+            loadQuizCard();
+          }
+        }
+      }
+
+      function handleNextClick() {
+        if (isTransitioning) return;
+
+        isTransitioning = true;
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 300);
+
+        if (gameState === "LEARN") {
+          currentColorInLevel++;
+          if (currentColorInLevel < levelsData[currentLevel].length) {
+            loadLearnCard();
+          } else {
+            // Switch to quiz mode for this level
+            gameState = "QUIZ";
+            currentColorInLevel = 0;
+            loadQuizCard();
+          }
+        }
+      }
+
+      function triggerConfetti() {
+        const canvas = document.getElementById("confetti-canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+
+        const particles = [];
+        const colors = ["#ef4444", "#3b82f6", "#22c55e", "#eab308", "#ec4899", "#a855f7"];
+
+        for (let i = 0; i < 45; i++) {
+          particles.push({
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.7) * 10,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            size: Math.random() * 8 + 4,
+          });
+        }
+
+        let frames = 0;
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          particles.forEach((p) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.3;
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          frames++;
+          if (frames < 40) requestAnimationFrame(animate);
+          else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        animate();
+      }
+    </script>
+  </body>
+</html>
