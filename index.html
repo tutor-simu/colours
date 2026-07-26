@@ -2,7 +2,7 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Уровни Цветов</title>
     <!-- Kid-friendly font from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet" />
@@ -12,57 +12,109 @@
         margin: 0;
         padding: 0;
         font-family: "Fredoka", "Comic Sans MS", cursive, sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
       }
 
+      /* Lock screen height - NO VERTICAL SCROLLBARS */
+      html,
       body {
-        background-color: #e0f7fa;
-        background-image: radial-gradient(#b2ebf2 2px, transparent 2px);
-        background-size: 20px 20px;
+        width: 100%;
+        height: 100%;
+        height: 100dvh;
+        overflow: hidden;
+      }
+
+      /* 20-slice Pie Graph Conic Gradient Background (18 degrees per slice) */
+      body {
+        background: conic-gradient(
+          #f44336 0deg 18deg,
+          /* 1.  Red — Красный */ #2196f3 18deg 36deg,
+          /* 2.  Blue — Синий */ #4caf50 36deg 54deg,
+          /* 3.  Green — Зелёный */ #ffeb3b 54deg 72deg,
+          /* 4.  Yellow — Жёлтый */ #ff9800 72deg 90deg,
+          /* 5.  Orange — Оранжевый */ #9c27b0 90deg 108deg,
+          /* 6.  Purple — Фиолетовый */ #ff4081 108deg 126deg,
+          /* 7.  Pink — Розовый */ #795548 126deg 144deg,
+          /* 8.  Brown — Коричневый */ #212121 144deg 162deg,
+          /* 9.  Black — Чёрный */ #ffffff 162deg 180deg,
+          /* 10. White — Белый */ #9e9e9e 180deg 198deg,
+          /* 11. Gray — Серый */ #00bcd4 198deg 216deg,
+          /* 12. Cyan — Голубой */ #e91e63 216deg 234deg,
+          /* 13. Magenta — Пурпурный */ #cddc39 234deg 252deg,
+          /* 14. Lime — Лаймовый */ #009688 252deg 270deg,
+          /* 15. Teal — Бирюзовый */ #1a237e 270deg 288deg,
+          /* 16. Navy — Тёмно-синий */ #880e4f 288deg 306deg,
+          /* 17. Maroon — Бордовый */ #558b2f 306deg 324deg,
+          /* 18. Olive — Оливковый */ #ffc107 324deg 342deg,
+          /* 19. Gold — Золотой */ #b0bec5 342deg 360deg /* 20. Silver — Серебристый */
+        );
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: 100vh;
-        padding: 20px;
+        padding: clamp(8px, 2vh, 16px);
+        position: relative;
       }
 
+      /* Soft overlay glass effect to keep card text high-contrast & readable */
+      body::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.22);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        z-index: 0;
+      }
+
+      /* Main interface card */
       .container {
-        background: #ffffff;
-        padding: 30px;
-        border-radius: 24px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-        border: 4px solid #4dd0e1;
-        max-width: 450px;
+        position: relative;
+        z-index: 1;
+        background: rgba(255, 255, 255, 0.95);
+        padding: clamp(10px, 2.5vh, 20px);
+        border-radius: max(20px, 3vw);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        border: min(1vw, 5px) solid #ffffff;
         width: 100%;
+        max-width: min(92vw, 480px);
+        height: 100%;
+        max-height: 100dvh;
         text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: clamp(6px, 1.5vh, 12px);
       }
 
       h1 {
-        font-size: 26px;
+        font-size: clamp(1.2rem, 3.8vh, 1.8rem);
         color: #ff4081;
-        margin-bottom: 20px;
         text-shadow: 2px 2px 0px #ffe0b2;
+        flex-shrink: 0;
       }
 
-      /* Top Navigation Buttons */
+      /* Top Level Nav Buttons Grid */
       .nav-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-bottom: 25px;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: clamp(4px, 1vw, 8px);
+        width: 100%;
+        flex-shrink: 0;
       }
 
       .nav-btn {
-        padding: 10px 14px;
+        padding: clamp(6px, 1.2vh, 10px) 2px;
         border: none;
         background-color: #ffd54f;
         color: #4e342e;
         border-radius: 50px;
-        font-size: 15px;
+        font-size: clamp(0.7rem, 2.2vh, 0.9rem);
         font-weight: 700;
         cursor: pointer;
-        box-shadow: 0 4px 0 #f57f17;
+        box-shadow: 0 3px 0 #f57f17;
         transition: all 0.1s ease;
+        white-space: nowrap;
       }
 
       .nav-btn:hover {
@@ -71,51 +123,60 @@
       }
 
       .nav-btn:active {
-        transform: translateY(3px);
+        transform: translateY(2px);
         box-shadow: 0 1px 0 #f57f17;
       }
 
       .nav-btn.active {
         background-color: #ff6090;
         color: #ffffff;
-        box-shadow: 0 4px 0 #c2185b;
+        box-shadow: 0 3px 0 #c2185b;
       }
 
-      /* Main Display Area */
+      /* Main Level Card Container */
       .level-card {
         background: #fff9c4;
-        border: 3px dashed #fbc02d;
-        border-radius: 20px;
-        padding: 20px;
+        border: min(0.6vw, 3px) dashed #fbc02d;
+        border-radius: max(12px, 2vw);
+        padding: clamp(8px, 1.8vh, 14px);
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        justify-content: space-between;
+        min-height: 0;
       }
 
       .level-title {
-        font-size: 24px;
+        font-size: clamp(1rem, 3vh, 1.3rem);
         font-weight: 700;
         color: #7b1fa2;
-        margin-bottom: 5px;
+        flex-shrink: 0;
       }
 
       .level-subtitle {
-        font-size: 14px;
+        font-size: clamp(0.75rem, 2vh, 0.88rem);
         color: #616161;
-        margin-bottom: 20px;
+        margin-bottom: clamp(4px, 1vh, 8px);
         font-weight: bold;
+        flex-shrink: 0;
       }
 
-      /* Colors Stacked Top to Bottom */
+      /* Color Card Stack */
       .color-stack {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: clamp(4px, 1.2vh, 10px);
+        flex-grow: 1;
+        justify-content: space-evenly;
       }
 
       .color-box {
-        padding: 18px;
-        border-radius: 16px;
-        font-size: 22px;
+        flex: 1;
+        max-height: 22%;
+        border-radius: clamp(8px, 1.5vh, 14px);
+        font-size: clamp(0.95rem, 2.8vh, 1.25rem);
         font-weight: 700;
-        box-shadow: 0 6px 0 rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
         letter-spacing: 0.5px;
         display: flex;
         align-items: center;
@@ -128,13 +189,47 @@
       .color-box:active {
         transform: scale(0.97);
       }
+
+      /* Bottom Play Button */
+      .play-game-btn {
+        width: 100%;
+        padding: clamp(10px, 2vh, 14px) 16px;
+        background-color: #22c55e;
+        color: #ffffff;
+        border: none;
+        border-radius: 50px;
+        font-size: clamp(1rem, 3vh, 1.3rem);
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 5px 0 #15803d;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex-shrink: 0;
+        transition: all 0.1s ease;
+      }
+
+      .play-game-btn:hover {
+        background-color: #4ade80;
+        transform: translateY(-2px);
+      }
+
+      .play-game-btn:active {
+        transform: translateY(3px);
+        box-shadow: 0 2px 0 #15803d;
+      }
+
+      .play-game-btn .arrow {
+        font-size: clamp(1.1rem, 3.2vh, 1.4rem);
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>🎨 Уровни Цветов 🎨</h1>
 
-      <!-- Level Buttons -->
+      <!-- Level Selection Buttons -->
       <div class="nav-buttons">
         <button class="nav-btn active" onclick="showLevel(1)">Уровень 1</button>
         <button class="nav-btn" onclick="showLevel(2)">Уровень 2</button>
@@ -148,28 +243,34 @@
         <div class="level-title" id="level-heading">⭐ Уровень 1 ⭐</div>
         <div class="level-subtitle" id="level-sub">Базовые цвета</div>
 
-        <!-- Top-to-Bottom Vertical Stack -->
+        <!-- Dynamic Color Stack -->
         <div class="color-stack" id="color-stack">
-          <!-- JS dynamic content -->
+          <!-- Populated by JavaScript -->
         </div>
       </div>
+
+      <!-- Dynamic Play Game Button -->
+      <button class="play-game-btn" id="play-btn" onclick="playGame()">
+        Играть в уровень 1 <span class="arrow">➡️</span>
+      </button>
     </div>
 
     <script>
       const synth = window.speechSynthesis;
       let welcomeSpoken = false;
+      let currentSelectedLevel = 1;
 
-      // Helper to pronounce Russian text
+      // Voice output helper
       function speakText(text) {
         if (!synth) return;
-        synth.cancel(); // Stop ongoing speech
+        synth.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "ru-RU";
-        utterance.rate = 0.9; // Friendly pace for kids
+        utterance.rate = 0.9;
         synth.speak(utterance);
       }
 
-      // Auto-welcome message in Russian
+      // Welcome voice greeting
       function playWelcome() {
         if (!welcomeSpoken) {
           welcomeSpoken = true;
@@ -177,13 +278,10 @@
         }
       }
 
-      // Try playing immediately on load
       window.addEventListener("load", () => {
-        // Small timeout allows SpeechSynthesis voices to load
         setTimeout(playWelcome, 500);
       });
 
-      // Fallback: If browser blocks autoplay, speak on the very first touch/click
       document.addEventListener(
         "click",
         () => {
@@ -194,7 +292,11 @@
         { once: true },
       );
 
-      // All 20 colors split into 5 levels
+      // Redirects to Level1.html, Level2.html, Level3.html, etc.
+      function playGame() {
+        window.location.href = `Level${currentSelectedLevel}.html`;
+      }
+
       const levelsData = {
         1: {
           title: "⭐ Уровень 1 ⭐",
@@ -249,13 +351,15 @@
       };
 
       function showLevel(levelNumber) {
+        currentSelectedLevel = levelNumber;
         const data = levelsData[levelNumber];
 
-        // Update Header Text
+        // Update Text & Play Button Label
         document.getElementById("level-heading").innerText = data.title;
         document.getElementById("level-sub").innerText = data.subtitle;
+        document.getElementById("play-btn").innerHTML = `Играть в уровень ${levelNumber} <span class="arrow">➡️</span>`;
 
-        // Update Navigation Buttons Active State
+        // Update Active Navigation Button Highlight
         const buttons = document.querySelectorAll(".nav-btn");
         buttons.forEach((btn, index) => {
           if (index + 1 === levelNumber) {
@@ -265,7 +369,7 @@
           }
         });
 
-        // Render Vertical Stack
+        // Render Level Color Cards
         const stack = document.getElementById("color-stack");
         stack.innerHTML = "";
 
@@ -273,7 +377,7 @@
           const box = document.createElement("div");
           box.className = "color-box";
           box.style.backgroundColor = item.bg;
-          box.style.borderBottom = `4px solid ${item.border}`;
+          box.style.borderBottom = `3px solid ${item.border}`;
           box.innerText = item.display;
 
           if (!item.textLight) {
@@ -284,14 +388,12 @@
             box.style.textShadow = "1px 2px 3px rgba(0, 0, 0, 0.4)";
           }
 
-          // Play audio of the color name in Russian on click
           box.onclick = () => speakText(item.ru);
-
           stack.appendChild(box);
         });
       }
 
-      // Load Level 1 on start
+      // Initialize default View (Level 1)
       showLevel(1);
     </script>
   </body>
